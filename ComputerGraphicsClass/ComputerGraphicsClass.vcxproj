@@ -131,12 +131,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="segundo_main.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mainbase.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="segundo_main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>

@@ -2,9 +2,11 @@
 #include <string.h>
 #include <glew.h>
 #include <glfw3.h>
+#include "segundo_main.h"
 //Dimensiones de la ventana
 const int WIDTH = 800, HEIGHT = 800;
 GLuint VAO, VBO, shader;
+GLuint VAO_Rombo, VBO_Rombo, VAO_Trapecio, VBO_Trapecio;
 
 //LENGUAJE DE SHADER (SOMBRAS) GLSL
 //Vertex Shader
@@ -27,87 +29,161 @@ void main()											\n\
 	color = vec4(1.0f,0.0f,0.0f,1.0f);	 			\n\
 }";
 
-
-
 void CrearTriangulo()
 {
-	GLfloat vertices[] = {
-		-1.0f, -1.0f,0.0f,
-		1.0f,-1.0f, 0.0f,
-		0.0f,1.0f,0.0f
+	//GLfloat vertices[] = 
+	//{
+	//	-1.0f, -1.0f, 0.0f,
+	//	 1.0f, -1.0f, 0.0f,
+	//	 0.0f,  1.0f, 0.0f
+	//};
+
+	GLfloat vertices[] =
+	{
+		// Triángulo superior
+		 0.0f,  0.5f, 0.0f,   // Vértice superior
+		-0.3f,  0.0f, 0.0f,   // Vértice izquierdo
+		 0.3f,  0.0f, 0.0f,   // Vértice derecho
+
+		 // Triángulo inferior
+		  0.0f, -0.5f, 0.0f,   // Vértice inferior
+		 -0.3f,  0.0f, 0.0f,   // Vértice izquierdo
+		  0.3f,  0.0f, 0.0f,    // Vértice derecho
+
+		// Triángulo izquierdo del trapecio
+		 0.5f,  0.4f, 0.0f,   // Superior izquierdo
+		 0.4f, -0.4f, 0.0f,   // Inferior izquierdo
+		 0.8f,  0.3f, 0.0f,   // Superior derecho intermedio
+
+		 // Triángulo derecho del trapecio
+		  0.4f, -0.4f, 0.0f,   // Inferior izquierdo
+		  0.9f, -0.4f, 0.0f,   // Inferior derecho
+		  0.8f,  0.3f, 0.0f    // Superior derecho intermedio
 	};
-	glGenVertexArrays(1, &VAO); //generar 1 VAO
-	glBindVertexArray(VAO);//asignar VAO
+
+	// Generar y asignar VAO
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	// Generar y configurar VBO
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Configurar atributos de vértices
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	// Desvincular
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void CreateRhombusAndTrapezium()
+{
+	GLfloat vertices[] =
+	{
+		// Triángulo superior
+		 0.0f,  0.5f, 0.0f,   // Vértice superior
+		-0.3f,  0.0f, 0.0f,   // Vértice izquierdo
+		 0.3f,  0.0f, 0.0f,   // Vértice derecho
+
+		 // Triángulo inferior
+		  0.0f, -0.5f, 0.0f,   // Vértice inferior
+		 -0.3f,  0.0f, 0.0f,   // Vértice izquierdo
+		  0.3f,  0.0f, 0.0f,    // Vértice derecho
+
+		  // Triángulo izquierdo del trapecio
+		   0.5f,  0.4f, 0.0f,   // Superior izquierdo
+		   0.4f, -0.4f, 0.0f,   // Inferior izquierdo
+		   0.8f,  0.3f, 0.0f,   // Superior derecho intermedio
+
+		   // Triángulo derecho del trapecio
+			0.4f, -0.4f, 0.0f,   // Inferior izquierdo
+			0.9f, -0.4f, 0.0f,   // Inferior derecho
+			0.8f,  0.3f, 0.0f    // Superior derecho intermedio
+	};
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //pasarle los datos al VBO asignando tamano, los datos y en este caso es estático pues no se modificarán los valores
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (GLvoid*)0);//Stride en caso de haber datos de color por ejemplo, es saltar cierta cantidad de datos
-		glEnableVertexAttribArray(0);
-		//agregar valores a vèrtices y luego declarar un nuevo vertexAttribPointer
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
-void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType) //Función para agregar los shaders a la tarjeta gráfica
 
-//the Program recibe los datos de theShader
-
+void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType)
 {
-	GLuint theShader = glCreateShader(shaderType);//theShader es un shader que se crea de acuerdo al tipo de shader: vertex o fragment
+	GLuint theShader = glCreateShader(shaderType);
+
 	const GLchar* theCode[1];
-	theCode[0] = shaderCode;//shaderCode es el texto que se le pasa a theCode
+	theCode[0] = shaderCode;
+
 	GLint codeLength[1];
-	codeLength[0] = strlen(shaderCode);//longitud del texto
-	glShaderSource(theShader,1, theCode, codeLength);//Se le asigna al shader el código
-	glCompileShader(theShader);//Se comila el shader
+	codeLength[0] = strlen(shaderCode);
+
+	glShaderSource(theShader, 1, theCode, codeLength);
+	glCompileShader(theShader);
+
+	// Verificar errores de compilación
 	GLint result = 0;
 	GLchar eLog[1024] = { 0 };
-	//verificaciones y prevención de errores
 	glGetShaderiv(theShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
-		printf("EL error al compilar el shader %d es: %s \n",shaderType, eLog);
+		printf("EL error al compilar el shader %d es: %s \n", shaderType, eLog);
 		return;
 	}
-	glAttachShader(theProgram, theShader);//Si no hubo problemas se asigna el shader a theProgram el cual asigna el código a la tarjeta gráfica
+
+	glAttachShader(theProgram, theShader);
 }
 
-void CompileShaders() {
-	shader= glCreateProgram(); //se crea un programa
+void CompileShaders() 
+{
+	shader = glCreateProgram(); //se crea un programa
+
 	if (!shader)
 	{
 		printf("Error creando el shader");
 		return;
+
 	}
+
 	AddShader(shader, vShader, GL_VERTEX_SHADER);//Agregar vertex shader
 	AddShader(shader, fShader, GL_FRAGMENT_SHADER);//Agregar fragment shader
+
 	//Para terminar de linkear el programa y ver que no tengamos errores
 	GLint result = 0;
 	GLchar eLog[1024] = { 0 };
+
 	glLinkProgram(shader);//se linkean los shaders a la tarjeta gráfica
-	 //verificaciones y prevención de errores
-	glGetProgramiv(shader, GL_LINK_STATUS, &result);
+	glGetProgramiv(shader, GL_LINK_STATUS, &result); //verificaciones y prevención de errores
+
 	if (!result)
 	{
 		glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
 		printf("EL error al linkear es: %s \n", eLog);
 		return;
 	}
+
 	glValidateProgram(shader);
 	glGetProgramiv(shader, GL_VALIDATE_STATUS, &result);
+
 	if (!result)
 	{
 		glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
 		printf("EL error al validar es: %s \n", eLog);
 		return;
 	}
-
-
-
 }
+
 int main()
 {
 	//Inicialización de GLFW
@@ -123,6 +199,7 @@ int main()
 	//Asignando variables de GLFW y propiedades de ventana
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
 	//para solo usar el core profile de OpenGL y no tener retrocompatibilidad
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -136,6 +213,7 @@ int main()
 		glfwTerminate();
 		return 1;
 	}
+
 	//Obtener tamaño de Buffer
 	int BufferWidth, BufferHeight;
 	glfwGetFramebufferSize(mainWindow, &BufferWidth, &BufferHeight);
@@ -159,24 +237,28 @@ int main()
 	glViewport(0, 0, BufferWidth, BufferHeight);
 
  //Llamada a las funciones creadas antes del main
-	CrearTriangulo();
+	//CrearTriangulo();
+	CreateRhombusAndTrapezium();
 	CompileShaders();
 
+	float timer = 0.0f;
 
 	//Loop mientras no se cierra la ventana
 	while (!glfwWindowShouldClose(mainWindow))
-	{
+	{	
+		timer++;
+
 		//Recibir eventos del usuario
 		glfwPollEvents();
 
-		//Limpiar la ventana
-		glClearColor(0.0f,0.0f,0.0f,1.0f);
+		LoopBackgroundColor(timer);
+
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES,0,3);
+		glDrawArrays(GL_TRIANGLES,0,12);
 		glBindVertexArray(0);
 
 		glUseProgram(0);
@@ -186,6 +268,25 @@ int main()
 		//NO ESCRIBIR NINGUNA LÍNEA DESPUÉS DE glfwSwapBuffers(mainWindow); 
 	}
 
-
 	return 0;
+}
+
+void LoopBackgroundColor(float& timer)
+{
+	if (timer > 0.0f && timer < 1000.0f)
+	{
+		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else if (timer > 1000.0f && timer < 2000.0f)
+	{
+		glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	}
+	else if (timer > 2000.0f && timer < 4000.0f)
+	{
+		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	}
+	else if (timer > 4000.0f)
+	{
+		timer = 0.0f;
+	}
 }

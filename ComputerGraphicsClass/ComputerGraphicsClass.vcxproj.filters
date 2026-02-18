@@ -24,11 +24,11 @@
     <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="segundo_main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mainbase.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
@@ -36,6 +36,9 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="segundo_main.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
