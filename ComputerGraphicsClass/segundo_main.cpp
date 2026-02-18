@@ -2,7 +2,6 @@
 #include <string.h>
 #include <glew.h>
 #include <glfw3.h>
-#include "segundo_main.h"
 //Dimensiones de la ventana
 const int WIDTH = 800, HEIGHT = 800;
 GLuint VAO, VBO, shader;
@@ -31,34 +30,11 @@ void main()											\n\
 
 void CrearTriangulo()
 {
-	//GLfloat vertices[] = 
-	//{
-	//	-1.0f, -1.0f, 0.0f,
-	//	 1.0f, -1.0f, 0.0f,
-	//	 0.0f,  1.0f, 0.0f
-	//};
-
-	GLfloat vertices[] =
+	GLfloat vertices[] = 
 	{
-		// Triángulo superior
-		 0.0f,  0.5f, 0.0f,   // Vértice superior
-		-0.3f,  0.0f, 0.0f,   // Vértice izquierdo
-		 0.3f,  0.0f, 0.0f,   // Vértice derecho
-
-		 // Triángulo inferior
-		  0.0f, -0.5f, 0.0f,   // Vértice inferior
-		 -0.3f,  0.0f, 0.0f,   // Vértice izquierdo
-		  0.3f,  0.0f, 0.0f,    // Vértice derecho
-
-		// Triángulo izquierdo del trapecio
-		 0.5f,  0.4f, 0.0f,   // Superior izquierdo
-		 0.4f, -0.4f, 0.0f,   // Inferior izquierdo
-		 0.8f,  0.3f, 0.0f,   // Superior derecho intermedio
-
-		 // Triángulo derecho del trapecio
-		  0.4f, -0.4f, 0.0f,   // Inferior izquierdo
-		  0.9f, -0.4f, 0.0f,   // Inferior derecho
-		  0.8f,  0.3f, 0.0f    // Superior derecho intermedio
+		-1.0f, -1.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,
+		 0.0f,  1.0f, 0.0f
 	};
 
 	// Generar y asignar VAO
@@ -79,29 +55,29 @@ void CrearTriangulo()
 	glBindVertexArray(0);
 }
 
-void CreateRhombusAndTrapezium()
+void CrearRomboYTrapecio()
 {
 	GLfloat vertices[] =
 	{
 		// Triángulo superior
-		 0.0f,  0.5f, 0.0f,   // Vértice superior
-		-0.3f,  0.0f, 0.0f,   // Vértice izquierdo
-		 0.3f,  0.0f, 0.0f,   // Vértice derecho
+		 0.0f,  0.5f, 0.0f, 
+		-0.3f,  0.0f, 0.0f, 
+		 0.3f,  0.0f, 0.0f, 
 
 		 // Triángulo inferior
-		  0.0f, -0.5f, 0.0f,   // Vértice inferior
-		 -0.3f,  0.0f, 0.0f,   // Vértice izquierdo
-		  0.3f,  0.0f, 0.0f,    // Vértice derecho
+		  0.0f, -0.5f, 0.0f, 
+		 -0.3f,  0.0f, 0.0f,   
+		  0.3f,  0.0f, 0.0f,    
 
 		  // Triángulo izquierdo del trapecio
-		   0.5f,  0.4f, 0.0f,   // Superior izquierdo
-		   0.4f, -0.4f, 0.0f,   // Inferior izquierdo
-		   0.8f,  0.3f, 0.0f,   // Superior derecho intermedio
+		   0.5f,  0.4f, 0.0f,   
+		   0.4f, -0.4f, 0.0f,   
+		   0.8f,  0.3f, 0.0f,   
 
 		   // Triángulo derecho del trapecio
-			0.4f, -0.4f, 0.0f,   // Inferior izquierdo
-			0.9f, -0.4f, 0.0f,   // Inferior derecho
-			0.8f,  0.3f, 0.0f    // Superior derecho intermedio
+			0.4f, -0.4f, 0.0f,   
+			0.9f, -0.4f, 0.0f,   
+			0.8f,  0.3f, 0.0f    
 	};
 
 	glGenVertexArrays(1, &VAO);
@@ -184,6 +160,26 @@ void CompileShaders()
 	}
 }
 
+void LoopBackgroundColor(float& timer)
+{
+	if (timer > 0.0f && timer < 1000.0f)
+	{
+		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else if (timer > 1000.0f && timer < 2000.0f)
+	{
+		glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	}
+	else if (timer > 2000.0f && timer < 4000.0f)
+	{
+		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	}
+	else if (timer > 4000.0f)
+	{
+		timer = 0.0f;
+	}
+}
+
 int main()
 {
 	//Inicialización de GLFW
@@ -238,7 +234,7 @@ int main()
 
  //Llamada a las funciones creadas antes del main
 	//CrearTriangulo();
-	CreateRhombusAndTrapezium();
+	CrearRomboYTrapecio();
 	CompileShaders();
 
 	float timer = 0.0f;
@@ -269,24 +265,4 @@ int main()
 	}
 
 	return 0;
-}
-
-void LoopBackgroundColor(float& timer)
-{
-	if (timer > 0.0f && timer < 1000.0f)
-	{
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-	}
-	else if (timer > 1000.0f && timer < 2000.0f)
-	{
-		glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-	}
-	else if (timer > 2000.0f && timer < 4000.0f)
-	{
-		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	}
-	else if (timer > 4000.0f)
-	{
-		timer = 0.0f;
-	}
 }

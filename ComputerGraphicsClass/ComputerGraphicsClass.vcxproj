@@ -131,7 +131,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="segundo_main.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
