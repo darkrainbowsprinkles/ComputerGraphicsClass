@@ -1,1 +1,19 @@
-# ComputerGraphicsClass
+# Repositorio – Computación Gráfica e Interacción Humano-Computadora
+
+FACULTAD DE INGENIERÍA
+
+DIVISIÓN DE INGENIERÍA ELÉCTRICA
+
+INGENIERÍA EN COMPUTACIÓN
+
+COMPUTACIÓN GRÁFICA e INTERACCIÓN HUMANO COMPUTADORA
+
+NOMBRE COMPLETO: Ortega Novoa Octavio
+
+Nº de Cuenta: 317147768
+
+GRUPO DE LABORATORIO: 03
+
+GRUPO DE TEORÍA: 06
+
+SEMESTRE: 2026-2
