@@ -1,11 +1,23 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 #include <glew.h>
 #include <glfw3.h>
+
 //Dimensiones de la ventana
 const int WIDTH = 800, HEIGHT = 800;
+const double TIME_PER_COLOR_CHANGE = 2.0;
+
 GLuint VAO, VBO, shader;
-GLuint VAO_Rombo, VBO_Rombo, VAO_Trapecio, VBO_Trapecio;
+
+struct Color
+{
+	float r, g, b;
+
+	Color(float r, float g, float b) : r(r), g(g), b(b) { }
+};
+
 
 //LENGUAJE DE SHADER (SOMBRAS) GLSL
 //Vertex Shader
@@ -60,24 +72,130 @@ void CrearRomboYTrapecio()
 	GLfloat vertices[] =
 	{
 		// Triángulo superior
-		 0.0f,  0.5f, 0.0f, 
-		-0.3f,  0.0f, 0.0f, 
-		 0.3f,  0.0f, 0.0f, 
+		0.0f, 0.5f, 0.0f, 
+		-0.3f, 0.0f, 0.0f, 
+		0.3f, 0.0f, 0.0f, 
 
-		 // Triángulo inferior
-		  0.0f, -0.5f, 0.0f, 
-		 -0.3f,  0.0f, 0.0f,   
-		  0.3f,  0.0f, 0.0f,    
+		// Triángulo inferior
+		0.0f, -0.5f, 0.0f, 
+		-0.3f, 0.0f, 0.0f,   
+		0.3f, 0.0f, 0.0f,    
 
-		  // Triángulo izquierdo del trapecio
-		   0.5f,  0.4f, 0.0f,   
-		   0.4f, -0.4f, 0.0f,   
-		   0.8f,  0.3f, 0.0f,   
+		// Triángulo izquierdo del trapecio
+		0.5f, 0.4f, 0.0f,   
+		0.4f, -0.4f, 0.0f,   
+		0.8f, 0.3f, 0.0f,   
 
-		   // Triángulo derecho del trapecio
-			0.4f, -0.4f, 0.0f,   
-			0.9f, -0.4f, 0.0f,   
-			0.8f,  0.3f, 0.0f    
+		// Triángulo derecho del trapecio
+		0.4f, -0.4f, 0.0f,   
+		0.9f, -0.4f, 0.0f,   
+		0.8f, 0.3f, 0.0f    
+	};
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void CrearLetrasIniciales()
+{
+	GLfloat vertices[] =
+	{
+		// LETRA O (abajo a la izquierda)
+
+		// Rectangulo izquierdo vertical
+		-0.80f, -0.40f, 0.0f,
+		-0.75f, -0.40f, 0.0f,
+		-0.80f, -0.70f, 0.0f,
+
+		-0.75f, -0.40f, 0.0f,
+		-0.75f, -0.70f, 0.0f,
+		-0.80f, -0.70f, 0.0f,
+
+		// Rectangulo derecho vertical
+		-0.60f, -0.40f, 0.0f,
+		-0.55f, -0.40f, 0.0f,
+		-0.60f, -0.70f, 0.0f,
+
+		-0.55f, -0.40f, 0.0f,
+		-0.55f, -0.70f, 0.0f,
+		-0.60f, -0.70f, 0.0f,
+
+		// Rectangulo superior horizontal
+		-0.80f, -0.40f, 0.0f,
+		-0.55f, -0.40f, 0.0f,
+		-0.80f, -0.45f, 0.0f,
+
+		-0.55f, -0.40f, 0.0f,
+		-0.55f, -0.45f, 0.0f,
+		-0.80f, -0.45f, 0.0f,
+
+		// Rectangulo inferior horizontal
+		-0.80f, -0.65f, 0.0f,
+		-0.55f, -0.65f, 0.0f,
+		-0.80f, -0.70f, 0.0f,
+
+		-0.55f, -0.65f, 0.0f,
+		-0.55f, -0.70f, 0.0f,
+		-0.80f, -0.70f, 0.0f,
+
+		// LETRA C (centro) 
+
+		// Rectangulo izquierdo vertical
+		-0.20f, 0.20f, 0.0f,
+		-0.15f, 0.20f, 0.0f,
+		-0.20f, -0.10f, 0.0f,
+
+		-0.15f, 0.20f, 0.0f,
+		-0.15f, -0.10f, 0.0f,
+		-0.20f, -0.10f, 0.0f,
+
+		// Rectangulo superior horizontal
+		-0.20f, 0.20f, 0.0f,
+		0.05f, 0.20f, 0.0f,
+		-0.20f, 0.15f, 0.0f,
+
+		0.05f, 0.20f, 0.0f,
+		0.05f, 0.15f, 0.0f,
+		-0.20f, 0.15f, 0.0f,
+
+		// Rectangulo inferior horizontal
+		-0.20f, -0.05f, 0.0f,
+		0.05f, -0.05f, 0.0f,
+		-0.20f, -0.10f, 0.0f,
+
+		0.05f, -0.05f, 0.0f,
+		0.05f, -0.10f, 0.0f,
+		-0.20f, -0.10f, 0.0f,
+
+		// LETRA T (arriba a la derecha)
+
+		// Barra horizontal superior
+		0.35f, 0.80f, 0.0f,
+		0.75f, 0.80f, 0.0f,
+		0.35f, 0.75f, 0.0f,
+
+		0.75f, 0.80f, 0.0f,
+		0.75f, 0.75f, 0.0f,
+		0.35f, 0.75f, 0.0f,
+
+		// Barra vertical central
+		0.525f, 0.75f, 0.0f,
+		0.575f, 0.75f, 0.0f,
+		0.525f, 0.45f, 0.0f,
+
+		0.575f, 0.75f, 0.0f,
+		0.575f, 0.45f, 0.0f,
+		0.525f, 0.45f, 0.0f
 	};
 
 	glGenVertexArrays(1, &VAO);
@@ -160,28 +278,31 @@ void CompileShaders()
 	}
 }
 
-void LoopBackgroundColor(float& timer)
+Color GetRandomColor()
 {
-	if (timer > 0.0f && timer < 1000.0f)
+	float r = (float)rand() / (float)RAND_MAX;
+	float g = (float)rand() / (float)RAND_MAX;
+	float b = (float)rand() / (float)RAND_MAX;
+	return Color(r, g, b);
+}
+
+void LoopBackgroundColor(double& lastColorChangeTime)
+{
+	double currentTime = glfwGetTime();
+	double elapsedTime = currentTime - lastColorChangeTime;
+
+	if (elapsedTime >= TIME_PER_COLOR_CHANGE)
 	{
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-	}
-	else if (timer > 1000.0f && timer < 2000.0f)
-	{
-		glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-	}
-	else if (timer > 2000.0f && timer < 4000.0f)
-	{
-		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	}
-	else if (timer > 4000.0f)
-	{
-		timer = 0.0f;
+		Color randomColor = GetRandomColor();
+		glClearColor(randomColor.r, randomColor.g, randomColor.b, 1.0f);
+		lastColorChangeTime = currentTime;
 	}
 }
 
 int main()
 {
+	srand((unsigned int)time(NULL));
+
 	//Inicialización de GLFW
 	if (!glfwInit())
 	{
@@ -234,27 +355,29 @@ int main()
 
  //Llamada a las funciones creadas antes del main
 	//CrearTriangulo();
-	CrearRomboYTrapecio();
+	//CrearRomboYTrapecio();
+	CrearLetrasIniciales();
 	CompileShaders();
 
-	float timer = 0.0f;
+	Color initialColor = GetRandomColor();
+	glClearColor(initialColor.r, initialColor.g, initialColor.b, 1.0f);
+
+	double lastColorChangeTime = glfwGetTime();
 
 	//Loop mientras no se cierra la ventana
 	while (!glfwWindowShouldClose(mainWindow))
 	{	
-		timer++;
-
 		//Recibir eventos del usuario
 		glfwPollEvents();
 
-		LoopBackgroundColor(timer);
+		LoopBackgroundColor(lastColorChangeTime);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES,0,12);
+		glDrawArrays(GL_TRIANGLES, 0, 60);
 		glBindVertexArray(0);
 
 		glUseProgram(0);
