@@ -153,7 +153,42 @@ void CrearLetrasyFiguras()
 	cuadradorojo->CreateMeshColor(vertices_cuadradorojo, 36);
 	meshColorList.push_back(cuadradorojo);
 
+	GLfloat vertices_trianguloazul[] = {
+		//X			Y			Z			R		G		B
+		-1.0f,	-1.0f,		0.5f,			0.0f,	0.0f,	1.0f,
+		1.0f,	-1.0f,		0.5f,			0.0f,	0.0f,	1.0f,
+		0.0f,	1.0f,		0.5f,			0.0f,	0.0f,	1.0f,
+	};
 
+	MeshColor* trianguloazul = new MeshColor();
+	trianguloazul->CreateMeshColor(vertices_trianguloazul, 18);
+	meshColorList.push_back(trianguloazul);
+
+	GLfloat vertices_cuadradocafe[] = {
+		//X			Y			Z			R		G		B
+		-0.5f,	-0.5f,		0.5f,			0.478, 0.255, 0.067,
+		0.5f,	-0.5f,		0.5f,			0.478, 0.255, 0.067,
+		0.5f,	0.5f,		0.5f,			0.478, 0.255, 0.067,
+		-0.5f,	-0.5f,		0.5f,			0.478, 0.255, 0.067,
+		0.5f,	0.5f,		0.5f,			0.478, 0.255, 0.067,
+		-0.5f,	0.5f,		0.5f,			0.478, 0.255, 0.067,
+
+	};
+
+	MeshColor* cuadradocafe = new MeshColor();
+	cuadradocafe->CreateMeshColor(vertices_cuadradocafe, 36);
+	meshColorList.push_back(cuadradocafe);
+
+	GLfloat vertices_trianguloverde[] = {
+		//X			Y			Z			R		G		B
+		-1.0f,	-1.0f,		0.5f,			0.0f,	0.5f,	0.0f,
+		1.0f,	-1.0f,		0.5f,			0.0f,	0.5f,	0.0f,
+		0.0f,	1.0f,		0.5f,			0.0f,	0.5f,	0.0f,
+	};
+
+	MeshColor* trianguloverde = new MeshColor();
+	trianguloverde->CreateMeshColor(vertices_trianguloverde, 18);
+	meshColorList.push_back(trianguloverde);
 }
 
 
@@ -206,52 +241,82 @@ int main()
 		shaderList[1].useShader();
 		uniformModel = shaderList[1].getModelLocation();
 		uniformProjection = shaderList[1].getProjectLocation();
-		
+
+		// Definir tamaños para la casa y las ventanas
+
+		glm::vec3 houseSize = glm::vec3(1.2f, 1.5f, 1.2f);
+		glm::vec3 windowSize = glm::vec3(0.4f, 0.4f, 0.4f);
+		glm::vec3 roofSize = glm::vec3(0.8f, 0.4f, 0.8f);
+		glm::vec3 logSize = glm::vec3(0.15f, 0.2f, 0.15f);
+		glm::vec3 treeSize = glm::vec3(0.18f, 0.3f, 0.18f);
+
 		//Inicializar matriz de dimensión 4x4 que servirá como matriz de modelo para almacenar las transformaciones geométricas
-		//cuadrado rojo
+
+		// Dibujo de la casa: Practica 2 ejercicio
+		
+		//cuadrado rojo - casa
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, -0.5f, -4.0f));
-		model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5));
+		model = glm::scale(model, houseSize);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		meshColorList[3]->RenderMeshColor();
 
-		//cuadrado verde 1
+		//cuadrado verde 1 - ventana izquierda
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(-0.3f, -0.1f, -3.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		model = glm::scale(model, windowSize);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
 		meshColorList[2]->RenderMeshColor();
 
-		//cuadrado verde 2
+		//cuadrado verde 2 - ventana derecha
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.3f, -0.1f, -3.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		model = glm::scale(model, windowSize);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
 		meshColorList[2]->RenderMeshColor();
 
-		//cuadrado verde 2
+		//cuadrado verde 3 - puerta
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, -0.8f, -3.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		model = glm::scale(model, windowSize);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
 		meshColorList[2]->RenderMeshColor();
 
-
-		//triangulo azul 1
+		//triangulo azul - techo
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-0.5f, 0.6f, -3.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		model = glm::translate(model, glm::vec3(0.0f, 0.6f, -3.0f));
+		model = glm::scale(model, roofSize);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
-		meshColorList[0]->RenderMeshColor();
+		meshColorList[4]->RenderMeshColor();
 
-		//triangulo azul 2
+		//cuadrado cafe - tronco izquierdo
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.5f, 0.6f, -3.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		model = glm::translate(model, glm::vec3(-0.8f, -0.9f, -3.0f));
+		model = glm::scale(model, logSize);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
-		meshColorList[0]->RenderMeshColor();
+		meshColorList[5]->RenderMeshColor();
 
+		//cuadrado cafe - tronco derecho
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.8f, -0.9f, -3.0f));
+		model = glm::scale(model, logSize);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
+		meshColorList[5]->RenderMeshColor();
+		
+		//triangulo verde - arbol izquierdo
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-0.8f, -0.5f, -3.0f));
+		model = glm::scale(model, treeSize);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
+		meshColorList[6]->RenderMeshColor();
+
+		//triangulo verde - arbol derecho
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.8f, -0.5f, -3.0f));
+		model = glm::scale(model, treeSize);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA y se envían al shader como variables de tipo uniform
+		meshColorList[6]->RenderMeshColor();
 
 		////Para el cubo y la pirámide se usa el primer set de shaders con índice 0 en ShaderList
 		//shaderList[0].useShader(); 
