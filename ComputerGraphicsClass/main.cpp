@@ -654,7 +654,7 @@ int main()
 
 		//DrawCubeAndPyramid(uniformModel, uniformProjection, model, projection);
 
-		Draw3DHouse(model, houseSize, uniformModel, uniformProjection, projection, windowSize, logSize, true);
+		Draw3DHouse(model, houseSize, uniformModel, uniformProjection, projection, windowSize, logSize, false);
 
 		glUseProgram(0);
 		mainWindow.swapBuffers();
