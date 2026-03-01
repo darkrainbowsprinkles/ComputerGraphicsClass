@@ -134,17 +134,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="practica2_editadolab3shaderrojo.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaderazul.vert" />
+    <None Include="shadercafe.vert" />
+    <None Include="shaderrojo.vert" />
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
     <None Include="shaders\shadercolor.frag" />
-    <None Include="shaders\shadercolor.vert" />
+    <None Include="shaderverde.vert" />
+    <None Include="shaderverdeoscuro.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="main.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Window.h" />
