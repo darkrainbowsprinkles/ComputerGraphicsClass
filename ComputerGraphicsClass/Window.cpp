@@ -13,6 +13,9 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 {
 	width = windowWidth;
 	height = windowHeight;
+	rotax = 0.0f;
+	rotay = 0.0f;
+	rotaz = 0.0f;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -35,7 +38,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	//CREAR VENTANA
-	mainWindow = glfwCreateWindow(width, height, "Practica 2: Proyecciones, transformaciones", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "Practica XX: Nombre de la práctica", NULL, NULL);
 
 	if (!mainWindow)
 	{
@@ -76,6 +79,21 @@ int Window::Initialise()
 void Window::createCallbacks()
 {
 	glfwSetKeyCallback(mainWindow, ManejaTeclado);
+	glfwSetCursorPosCallback(mainWindow, ManejaMouse);
+}
+
+GLfloat Window::getXChange()
+{
+	GLfloat theChange = xChange;
+	xChange = 0.0f;
+	return theChange;
+}
+
+GLfloat Window::getYChange()
+{
+	GLfloat theChange = yChange;
+	yChange = 0.0f;
+	return theChange;
 }
 
 void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode)
@@ -87,10 +105,24 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
+	if (key == GLFW_KEY_R)
+	{
+		theWindow->rotay += 10.0; //rotar sobre el eje y 10 grados
+	}
+	else if (key == GLFW_KEY_E)
+	{
+		theWindow->rotax += 10.0;
+	}
+	else if (key == GLFW_KEY_T)
+	{
+		theWindow->rotaz += 10.0;
+	}
+
+
 	if (key == GLFW_KEY_D && action == GLFW_PRESS)
 	{
 		const char* key_name = glfwGetKeyName(GLFW_KEY_D, 0);
-		printf("se presiono la tecla: %s\n",key_name);
+		//printf("se presiono la tecla: %s\n",key_name);
 	}
 
 	if (key >= 0 && key < 1024)
@@ -98,15 +130,34 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		if (action == GLFW_PRESS)
 		{
 			theWindow->keys[key] = true;
-			printf("se presiono la tecla %d'\n", key);
+			//printf("se presiono la tecla %d'\n", key);
 		}
 		else if (action == GLFW_RELEASE)
 		{
 			theWindow->keys[key] = false;
-			printf("se solto la tecla %d'\n", key);
+			//printf("se solto la tecla %d'\n", key);
 		}
 	}
 }
+
+void Window::ManejaMouse(GLFWwindow* window, double xPos, double yPos)
+{
+	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	if (theWindow->mouseFirstMoved)
+	{
+		theWindow->lastX = xPos;
+		theWindow->lastY = yPos;
+		theWindow->mouseFirstMoved = false;
+	}
+
+	theWindow->xChange = xPos - theWindow->lastX;
+	theWindow->yChange = theWindow->lastY - yPos;
+
+	theWindow->lastX = xPos;
+	theWindow->lastY = yPos;
+}
+
 
 Window::~Window()
 {

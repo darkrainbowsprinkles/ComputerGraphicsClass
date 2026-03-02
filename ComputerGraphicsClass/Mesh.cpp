@@ -1,14 +1,5 @@
 #include "Mesh.h"
 
-
-MeshColor::MeshColor() //creación de clase 
-{
-	VAO = 0;
-	VBO = 0;
-	vertexCount = 0;
-
-}
-
 Mesh::Mesh()
 {
 	VAO = 0;
@@ -17,25 +8,16 @@ Mesh::Mesh()
 	indexCount = 0;
 
 }
-
-void MeshColor::CreateMeshColor(GLfloat *vertices, unsigned int numOfVertices) //función de creación de VAO, VBO, IBO
+MeshColor::MeshColor()
 {
-	vertexCount = numOfVertices;
-	glGenVertexArrays(1, &VAO); //generar 1 VAO
-	glBindVertexArray(VAO);//asignar VAO
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, vertices, GL_STATIC_DRAW); //pasarle los datos al VBO asignando tamaño, los datos y en este caso es estático pues no se modificarán los valores
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(vertices[0]), 0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 *sizeof(vertices[0]), (void*)(3*sizeof(vertices[0])));//Offset de los 3 vértices para tomar los 3 de color
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	VAO = 0;
+	VBO = 0;
+	vertexCount = 0;
 
 }
 
-void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numberOfIndices)
+
+void Mesh::CreateMesh(GLfloat *vertices, unsigned int *indices, unsigned int numOfVertices, unsigned int numberOfIndices)
 {
 
 	indexCount = numberOfIndices;
@@ -50,7 +32,7 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, vertices, GL_STATIC_DRAW); //pasarle los datos al VBO asignando tamaño, los datos y en este caso es estático pues no se modificarán los valores
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(vertices[0]), 0);//Stride en caso de haber datos de color por ejemplo, es saltar cierta cantidad de datos
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -58,12 +40,45 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
 
 }
 
-void MeshColor::RenderMeshColor() //Función de Render (Dibujado)
+void Mesh::CreateMeshGeometry(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices, unsigned int numOfVertices, unsigned int numberOfIndices)
 {
-	////////////Para dibujar desde los vértices
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+
+	indexCount = numberOfIndices;
+	glGenVertexArrays(1, &VAO); //generar 1 VAO
+	glBindVertexArray(VAO);//asignar VAO
+
+	glGenBuffers(1, &IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * numberOfIndices, &indices[0], GL_STATIC_DRAW);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, &vertices[0], GL_STATIC_DRAW); //pasarle los datos al VBO asignando tamaño, los datos y en este caso es estático pues no se modificarán los valores
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+}
+
+void MeshColor::CreateMeshColor(GLfloat *vertices, unsigned int numOfVertices)
+{
+	vertexCount = numOfVertices;
+	glGenVertexArrays(1, &VAO); //generar 1 VAO
+	glBindVertexArray(VAO);//asignar VAO
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, vertices, GL_STATIC_DRAW); //pasarle los datos al VBO asignando tamaño, los datos y en este caso es estático pues no se modificarán los valores
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 6, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 6, (void*)(sizeof(vertices[0]) * 3));//Offset de los 3 vértices para tomar los 3 de color
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
 }
 
 void Mesh::RenderMesh()
@@ -76,6 +91,23 @@ void Mesh::RenderMesh()
 	glBindVertexArray(0);
 }
 
+void MeshColor::RenderMeshColor()
+{
+	////////////Para dibujar desde los vértices
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+	glBindVertexArray(0);
+}
+
+void Mesh::RenderMeshGeometry()
+{
+	////////////Para dibujar desde los índices
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glDrawElements(GL_TRIANGLE_FAN, indexCount, GL_UNSIGNED_INT, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
 
 void Mesh::ClearMesh()
 {
