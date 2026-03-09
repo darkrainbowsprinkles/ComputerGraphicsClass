@@ -30,7 +30,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="practica3.cpp">
+    <ClCompile Include="practica4_conjerarquia_grupo3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
