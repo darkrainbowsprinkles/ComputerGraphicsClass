@@ -419,7 +419,7 @@ int main()
 
 		//tercer brazo
 		model = modelaux;
-		model = glm::translate(model, glm::vec3(-2.5f, -2.5f, 0.0f));
+		model = glm::translate(model, glm::vec3(2.5f, -2.5f, 0.0f));
 		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
