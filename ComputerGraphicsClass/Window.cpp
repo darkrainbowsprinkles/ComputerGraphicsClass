@@ -22,7 +22,17 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	articulacion4 = 0.0f;
 	articulacion5 = 0.0f;
 	articulacion6 = 0.0f;
-	
+	llanta1 = 0.0f;
+	llanta2 = 0.0f;
+	llanta3 = 0.0f;
+	llanta4 = 0.0f;
+	pata1_1 = 0.0f; pata1_2 = 0.0f;
+	pata2_1 = 0.0f; pata2_2 = 0.0f;
+	pata3_1 = 0.0f; pata3_2 = 0.0f;
+	pata4_1 = 0.0f; pata4_2 = 0.0f;
+	orejaL = 0.0f; orejaR = 0.0f;
+	colaLobo = 0.0f;
+
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -45,7 +55,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	//CREAR VENTANA
-	mainWindow = glfwCreateWindow(width, height, "Practica XX: Nombre de la práctica", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "Practica 4: Modelado Jerarquico", NULL, NULL);
 
 	if (!mainWindow)
 	{
@@ -151,6 +161,34 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		theWindow->articulacion6 += 10.0;
 	}
 
+	if (key == GLFW_KEY_Z)
+	{
+		theWindow->llanta1 += 10.0;
+	}
+	if (key == GLFW_KEY_X)
+	{
+		theWindow->llanta2 += 10.0;
+	}
+	if (key == GLFW_KEY_C)
+	{
+		theWindow->llanta3 += 10.0;
+	}
+	if (key == GLFW_KEY_V)
+	{
+		theWindow->llanta4 += 10.0;
+	}
+
+	if (key == GLFW_KEY_U) theWindow->pata1_1 += 5.0; // Pierna Delantera Izquierda
+	if (key == GLFW_KEY_I) theWindow->pata1_2 += 5.0;
+	if (key == GLFW_KEY_O) theWindow->pata2_1 += 5.0; // Pierna Delantera Derecha
+	if (key == GLFW_KEY_P) theWindow->pata2_2 += 5.0;
+	if (key == GLFW_KEY_N) theWindow->pata3_1 += 5.0; // Pierna Trasera Izquierda
+	if (key == GLFW_KEY_M) theWindow->pata3_2 += 5.0;
+	if (key == GLFW_KEY_1) theWindow->pata4_1 += 5.0; // Pierna Trasera Derecha
+	if (key == GLFW_KEY_2) theWindow->pata4_2 += 5.0;
+	if (key == GLFW_KEY_3) theWindow->orejaL += 5.0; // Oreja Izquierda
+	if (key == GLFW_KEY_4) theWindow->orejaR -= 5.0; // Oreja Derecha
+	if (key == GLFW_KEY_5) theWindow->colaLobo += 5.0; // Articulación 2 de la Cola
 
 	if (key == GLFW_KEY_D && action == GLFW_PRESS)
 	{

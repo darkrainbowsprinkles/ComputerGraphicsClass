@@ -1,5 +1,5 @@
 /*Práctica 4: Modelado Jerárquico.
-Se implementa el uso de matrices adicionales para almacenar información de transformaciones geométricas que se quiere 
+Se implementa el uso de matrices adicionales para almacenar información de transformaciones geométricas que se quiere
 heredar entre diversas instancias para que estén unidas
 Teclas de la F a la K para rotaciones de articulaciones
 */
@@ -25,7 +25,7 @@ Teclas de la F a la K para rotaciones de articulaciones
 //tecla T: Rotar sobre el eje Z
 using std::vector;
 //Dimensiones de la ventana
-const float toRadians = 3.14159265f/180.0; //grados a radianes
+const float toRadians = 3.14159265f / 180.0; //grados a radianes
 const float PI = 3.14159265f;
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
@@ -122,8 +122,8 @@ void CrearCilindro(int res, float R) {
 		}
 		//caso para terminar el círculo
 		else {
-			x = R * cos((0)*dt);
-			z = R * sin((0)*dt);
+			x = R * cos((0) * dt);
+			z = R * sin((0) * dt);
 		}
 		for (i = 0; i < 6; i++) {
 			switch (i) {
@@ -191,19 +191,19 @@ void CrearCilindro(int res, float R) {
 	for (i = 0; i < vertices.size(); i++) indices.push_back(i);
 
 	//se genera el mesh del cilindro
-	Mesh *cilindro = new Mesh();
+	Mesh* cilindro = new Mesh();
 	cilindro->CreateMeshGeometry(vertices, indices, vertices.size(), indices.size());
 	meshList.push_back(cilindro);
 }
 
 //función para crear un cono
-void CrearCono(int res,float R) {
+void CrearCono(int res, float R) {
 
 	//constantes utilizadas en los ciclos for
 	int n, i;
 	//cálculo del paso interno en la circunferencia y variables que almacenarán cada coordenada de cada vértice
 	GLfloat dt = 2 * PI / res, x, z, y = -0.5f;
-	
+
 	vector<GLfloat> vertices;
 	vector<unsigned int> indices;
 
@@ -211,7 +211,7 @@ void CrearCono(int res,float R) {
 	vertices.push_back(0.0);
 	vertices.push_back(0.5);
 	vertices.push_back(0.0);
-	
+
 	//ciclo for para crear los vértices de la circunferencia del cono
 	for (n = 0; n <= (res); n++) {
 		x = R * cos((n)*dt);
@@ -235,10 +235,10 @@ void CrearCono(int res,float R) {
 	vertices.push_back(R * sin(0) * dt);
 
 
-	for (i = 0; i < res+2; i++) indices.push_back(i);
+	for (i = 0; i < res + 2; i++) indices.push_back(i);
 
 	//se genera el mesh del cono
-	Mesh *cono = new Mesh();
+	Mesh* cono = new Mesh();
 	cono->CreateMeshGeometry(vertices, indices, vertices.size(), res + 2);
 	meshList.push_back(cono);
 }
@@ -262,21 +262,381 @@ void CrearPiramideCuadrangular()
 		-0.5f,-0.5f,0.5f,
 		0.0f,0.5f,0.0f,
 	};
-	Mesh *piramide = new Mesh();
+	Mesh* piramide = new Mesh();
 	piramide->CreateMeshGeometry(piramidecuadrangular_vertices, piramidecuadrangular_indices, 15, 18);
 	meshList.push_back(piramide);
 }
 
-
-
 void CreateShaders()
 {
-	Shader *shader1 = new Shader();
+	Shader* shader1 = new Shader();
 	shader1->CreateFromFiles(vShader, fShader);
 	shaderList.push_back(*shader1);
-
 }
 
+void DibujarGrua(glm::mat4 model, glm::mat4 modelaux, glm::mat4 modelauxBase, glm::vec3 color, GLuint uniformModel, GLuint uniformColor)
+{
+	//CREANDO LA CABINA
+	model = glm::translate(model, glm::vec3(0.0f, 7.0f, -4.0f));
+	//aqui está la jerarquía
+	modelaux = model;
+	modelauxBase = model;
+	model = glm::scale(model, glm::vec3(7.0f, 4.0f, 5.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	color = glm::vec3(0.0f, 1.0f, 0.0f);
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
+	meshList[0]->RenderMesh();
+
+	//crear la articulación 1
+	model = modelaux;
+	model = glm::rotate(model, glm::radians(mainWindow.getarticulacion1()), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, glm::radians(135.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+	// Creando el brazo de una grúa
+		//articulacion1 hasta articulación5 sólo son puntos de rotación o articulación, en este caso no dibujaremos esferas que los representen
+
+	//primer brazo que conecta con la cabina
+
+	//para reiniciar la matriz de modelo con valor de la matriz identidad
+	//model = glm::mat4(1.0); en jerarquía rompe la conexión
+	//rotación alrededor de la articulación que une con la cabina
+	model = glm::translate(model, glm::vec3(2.5f, 0.0f, 0.0f));
+	modelaux = model;
+	model = glm::scale(model, glm::vec3(5.0f, 1.0f, 1.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	color = glm::vec3(1.0f, 0.0f, 1.0f);
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
+	meshList[0]->RenderMesh(); //dibuja cubo y pirámide triangular
+	//meshList[3]->RenderMeshGeometry(); //dibuja las figuras geométricas cilindro, cono, pirámide base cuadrangular
+	//sp.render(); //dibuja esfera
+
+	//articulacion 2
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(2.5f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(mainWindow.getarticulacion2()), glm::vec3(0.0f, 0.0f, 1.0f));
+	modelaux = model;
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	sp.render();
+	//segundo brazo
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(0.0f, -2.5f, 0.0f));
+	modelaux = model;
+	model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	color = glm::vec3(0.0f, 1.0f, 0.0f);
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
+	meshList[0]->RenderMesh(); //dibuja cubo y pirámide triangular
+
+	model = modelaux;
+
+	//articulación 3 extremo derecho del segundo brazo
+	model = glm::translate(model, glm::vec3(0.0f, -2.5f, 0.0f));
+	model = glm::rotate(model, glm::radians(mainWindow.getarticulacion3()), glm::vec3(0.0f, 0.0f, 1.0f));
+	modelaux = model;
+
+	//dibujar una pequeña esfera
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	sp.render();
+
+	// Crear instancias para completar el brazo y  la cabina. Imporante considerar que la cabina es el nodo padre. 
+	//La cabina y el brazo deben de estar unidos a la cabina 
+
+	//tercer brazo
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(2.5f, 0.0f, 0.0f));
+	modelaux = model;
+	model = glm::scale(model, glm::vec3(5.0f, 1.0f, 1.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	color = glm::vec3(1.0f,0.0f, 0.0f);
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
+	meshList[0]->RenderMesh(); //dibuja cubo y pirámide triangular
+
+	//articulación 4
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(2.5f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(mainWindow.getarticulacion4()), glm::vec3(0.0f, 1.0f, 0.0f));
+	modelaux = model;
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	sp.render();
+
+	//canasta
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+	modelaux = model;
+	model = glm::scale(model, glm::vec3(2.0f, 3.0f, 2.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	color = glm::vec3(0.0f, 1.0f, 0.0f);
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
+	meshList[0]->RenderMesh(); //dibuja cubo y pirámide triangular
+
+	//base
+	model = modelauxBase;
+	model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
+	modelauxBase = model;
+	model = glm::scale(model, glm::vec3(9.0f, 3.0f, 3.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	color = glm::vec3(0.0f, 0.0f, 1.0f);
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
+	meshList[4]->RenderMeshGeometry(); 
+
+	//llanta 1
+	model = modelauxBase;
+	model = glm::translate(model, glm::vec3(3.0f, -1.0f, 2.0f)); 
+	model = glm::rotate(model, glm::radians(mainWindow.getllanta1()), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotacion para llanta1
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(1.5f, 0.8f, 1.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	color = glm::vec3(1.0f, 1.0f, 0.0f); // Color Cian para llanta
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); 
+	meshList[2]->RenderMeshGeometry();
+
+	//llanta 2
+	model = modelauxBase;
+	model = glm::translate(model, glm::vec3(-3.0f, -1.0f, 2.0f)); 
+	model = glm::rotate(model, glm::radians(mainWindow.getllanta2()), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotacion para llanta2
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(1.5f, 0.8f, 1.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); 
+	meshList[2]->RenderMeshGeometry();
+
+	//llanta 3
+	model = modelauxBase;
+	model = glm::translate(model, glm::vec3(3.0f, -1.0f, -2.0f)); 
+	model = glm::rotate(model, glm::radians(mainWindow.getllanta3()), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotacion para llanta3
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(1.5f, 0.8f, 1.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); 
+	meshList[2]->RenderMeshGeometry();
+
+	//llanta 4
+	model = modelauxBase;
+	model = glm::translate(model, glm::vec3(-3.0f, -1.0f, -2.0f)); 
+	model = glm::rotate(model, glm::radians(mainWindow.getllanta4()), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotacion para llanta4
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(1.5f, 0.8f, 1.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color)); 
+	meshList[2]->RenderMeshGeometry();
+}
+
+void DibujarLobo(glm::mat4 model, glm::mat4 rootTorso, glm::mat4 modelaux, glm::mat4 jointaux, GLuint uniformModel, GLuint uniformColor)
+{
+	model = glm::translate(model, glm::vec3(-7.0f, 3.0f, -4.0f)); 
+	rootTorso = model; // Nodo padre (torso)
+
+	glm::vec3 colorGrey = glm::vec3(0.12f, 0.12f, 0.12f);
+	glm::vec3 colorDarkGrey = glm::vec3(0.35f, 0.35f, 0.35f); 
+	glm::vec3 colorEar = glm::vec3(0.20f, 0.20f, 0.20f); 
+
+	// 1) Torso (nodo raiz de la jerarquia)
+	model = glm::scale(rootTorso, glm::vec3(1.3f, 1.0f, 2.8f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+	meshList[0]->RenderMesh(); 
+
+	// 1.1) Melena (hija de torso)
+	glm::mat4 rootMane = glm::translate(rootTorso, glm::vec3(0.0f, 0.15f, 1.0f)); 
+	model = glm::scale(rootMane, glm::vec3(1.6f, 1.4f, 1.4f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+	meshList[0]->RenderMesh(); 
+
+	// 2) Cabeza (hija de torso)
+	glm::mat4 rootHead = glm::translate(rootTorso, glm::vec3(0.0f, 0.9f, 1.6f)); 
+	model = glm::scale(rootHead, glm::vec3(1.0f, 1.0f, 1.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+	meshList[0]->RenderMesh(); 
+
+	// 2.1) Hocico 
+	glm::mat4 rootSnout = glm::translate(rootHead, glm::vec3(0.0f, -0.2f, 0.65f)); 
+	model = glm::scale(rootSnout, glm::vec3(0.4f, 0.3f, 0.4f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorDarkGrey));
+	meshList[0]->RenderMesh(); 
+
+	// 2.1.1) Nariz (hija de hocico)
+	glm::mat4 rootNose = glm::translate(rootSnout, glm::vec3(0.0f, 0.08f, 0.22f));
+	model = glm::scale(rootNose, glm::vec3(0.15f, 0.1f, 0.1f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
+	meshList[0]->RenderMesh(); 
+
+	// 2.2) Oreja izquierda (hija de cabeza)
+	modelaux = glm::translate(rootHead, glm::vec3(-0.35f, 0.8f, -0.2f));
+	modelaux = glm::rotate(modelaux, glm::radians(mainWindow.getorejaL()), glm::vec3(0.0f, 1.0f, 0.0f)); 
+	model = glm::scale(modelaux, glm::vec3(0.4f, 0.8f, 0.3f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorEar));
+	meshList[1]->RenderMesh(); 
+
+	// 2.3) Oreja derecha (hija de cabeza)
+	modelaux = glm::translate(rootHead, glm::vec3(0.35f, 0.8f, -0.2f));
+	modelaux = glm::rotate(modelaux, glm::radians(mainWindow.getorejaR()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::scale(modelaux, glm::vec3(0.4f, 0.8f, 0.3f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorEar));
+	meshList[1]->RenderMesh(); 
+
+	// 2.4) Ojo izquierdo (hijo de cabeza)
+	glm::vec3 colorEye = glm::vec3(1.0f, 0.7f, 0.0f);
+	glm::mat4 rootEyeL = glm::translate(rootHead, glm::vec3(-0.25f, 0.1f, 0.45f));
+	model = glm::scale(rootEyeL, glm::vec3(0.08f, 0.15f, 0.15f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorEye));
+	sp.render(); 
+
+	// 2.4.1) Pupila izquierda (hija de ojo izquierdo)
+	glm::vec3 colorPupil = glm::vec3(0.0f, 0.0f, 0.0f);
+	modelaux = glm::translate(rootEyeL, glm::vec3(0.0f, 0.0f, 0.12f)); 
+	modelaux = glm::scale(modelaux, glm::vec3(0.05f, 0.1f, 0.05f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorPupil));
+	sp.render();
+
+	// 2.5) Ojo derecho (hijo de cabeza)
+	glm::mat4 rootEyeR = glm::translate(rootHead, glm::vec3(0.25f, 0.1f, 0.45f));
+	model = glm::scale(rootEyeR, glm::vec3(0.08f, 0.15f, 0.15f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorEye));
+	sp.render();
+
+	// 2.5.1) Pupila derecha (hija de ojo derecho)
+	modelaux = glm::translate(rootEyeR, glm::vec3(0.0f, 0.0f, 0.12f)); 
+	modelaux = glm::scale(modelaux, glm::vec3(0.05f, 0.1f, 0.05f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorPupil));
+	sp.render();
+
+	// 3) Base de la cola (hija de torso)
+	glm::mat4 rootTail = glm::translate(rootTorso, glm::vec3(0.0f, 0.3f, -1.5f)); 
+	rootTail = glm::rotate(rootTail, glm::radians(-30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	modelaux = glm::translate(rootTail, glm::vec3(0.0f, 0.4f, 0.0f)); 
+	model = glm::scale(modelaux, glm::vec3(0.3f, 0.8f, 0.3f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+	meshList[0]->RenderMesh(); 
+
+	// 3.1) Medio de la cola
+	glm::mat4 midTail = glm::translate(rootTail, glm::vec3(0.0f, 0.8f, 0.0f)); 
+	midTail = glm::rotate(midTail, glm::radians(mainWindow.getcolaLobo()), glm::vec3(0.0f, 0.0f, 1.0f)); 
+	modelaux = glm::translate(midTail, glm::vec3(0.0f, 0.35f, 0.0f)); 
+	model = glm::scale(modelaux, glm::vec3(0.25f, 0.7f, 0.25f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+	meshList[0]->RenderMesh(); 
+
+	// 3.1.1) Punta de la cola 
+	glm::mat4 tipTail = glm::translate(midTail, glm::vec3(0.0f, 0.7f, 0.0f)); 
+	tipTail = glm::rotate(tipTail, glm::radians(mainWindow.getcolaLobo() * 0.5f), glm::vec3(0.0f, 0.0f, 1.0f));
+	modelaux = glm::translate(tipTail, glm::vec3(0.0f, 0.2f, 0.0f)); 
+	model = glm::scale(modelaux, glm::vec3(0.2f, 0.4f, 0.2f)); 
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey)); 
+	meshList[0]->RenderMesh(); 
+
+	// 4.1) Pata 1: delantera izquierda
+	jointaux = glm::translate(rootTorso, glm::vec3(-0.45f, -0.5f, 1.0f)); 
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata1_1()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f)); 
+	model = glm::scale(model, glm::vec3(0.4f, 1.0f, 0.4f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+	meshList[2]->RenderMeshGeometry(); 
+
+	// 4.1.1) Articulacion rodilla de pata 1
+	jointaux = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.0f)); 
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata1_2()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.3f, 1.0f, 0.3f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	meshList[2]->RenderMeshGeometry();
+
+	// 4.1.2) Pezuña pata 1 (hija de rodilla 1)
+	model = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.2f));
+	model = glm::scale(model, glm::vec3(0.35f, 0.2f, 0.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorDarkGrey));
+	meshList[0]->RenderMesh(); 
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey)); 
+
+	// 4.2) Pata 2: delantera derecha
+	jointaux = glm::translate(rootTorso, glm::vec3(0.45f, -0.5f, 1.0f));
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata2_1()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.4f, 1.0f, 0.4f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	meshList[2]->RenderMeshGeometry();
+
+	// 4.2.1) Articulacion rodilla de pata 2
+	jointaux = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.0f));
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata2_2()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.3f, 1.0f, 0.3f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	meshList[2]->RenderMeshGeometry();
+
+	// 4.2.2) Pezuña pata 2 (hija de rodilla 2)
+	model = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.2f));
+	model = glm::scale(model, glm::vec3(0.35f, 0.2f, 0.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorDarkGrey));
+	meshList[0]->RenderMesh();
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+
+	// 4.3) Pata 3: trasera izquierda
+	jointaux = glm::translate(rootTorso, glm::vec3(-0.45f, -0.5f, -1.0f));
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata3_1()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.4f, 1.0f, 0.4f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	meshList[2]->RenderMeshGeometry();
+
+	// 4.3.1) Articulacion rodilla de pata 3
+	jointaux = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.0f));
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata3_2()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.3f, 1.0f, 0.3f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	meshList[2]->RenderMeshGeometry();
+
+	// 4.3.2) Pezuña pata 3 (hija de rodilla 3)
+	model = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.2f));
+	model = glm::scale(model, glm::vec3(0.35f, 0.2f, 0.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorDarkGrey));
+	meshList[0]->RenderMesh();
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorGrey));
+
+	// 4.4) Pata 4: trasera derecha
+	jointaux = glm::translate(rootTorso, glm::vec3(0.45f, -0.5f, -1.0f));
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata4_1()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.4f, 1.0f, 0.4f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	meshList[2]->RenderMeshGeometry();
+
+	// 4.4.1) Articulacion rodilla de pata 4
+	jointaux = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.0f));
+	jointaux = glm::rotate(jointaux, glm::radians(mainWindow.getpata4_2()), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(jointaux, glm::vec3(0.0f, -0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.3f, 1.0f, 0.3f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	meshList[2]->RenderMeshGeometry();
+
+	// 4.4.2) Pezuña pata 4 (hija de rodilla 4)
+	model = glm::translate(jointaux, glm::vec3(0.0f, -1.0f, 0.2f));
+	model = glm::scale(model, glm::vec3(0.35f, 0.2f, 0.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(colorDarkGrey));
+	meshList[0]->RenderMesh();
+}
 
 int main()
 {
@@ -291,7 +651,7 @@ int main()
 	CrearPiramideCuadrangular();//índice 4 en MeshList
 	CreateShaders();
 	
-	
+
 
 	/*Cámara se usa el comando: glm::lookAt(vector de posición, vector de orientación, vector up));
 	En la clase Camera se reciben 5 datos:
@@ -308,17 +668,20 @@ int main()
 	GLuint uniformModel = 0;
 	GLuint uniformView = 0;
 	GLuint uniformColor = 0;
-	glm::mat4 projection = glm::perspective(glm::radians(60.0f)	,mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(60.0f), mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
 	//glm::mat4 projection = glm::ortho(-1, 1, -1, 1, 1, 10);
-	
+
 	//Loop mientras no se cierra la ventana
 	sp.init(); //inicializar esfera
 	sp.load();//enviar la esfera al shader
 
-	glm::mat4 model(1.0);//Inicializar matriz de Modelo 4x4
-	glm::mat4 modelaux(1.0);//Inicializar matriz de Modelo 4x4 auxiliar para la jerarquía
+	glm::mat4 model(1.0);
+	glm::mat4 modelaux(1.0);
+	glm::mat4 modelauxBase(1.0);
+	glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	glm::vec3 color = glm::vec3(0.0f,0.0f,0.0f); //inicializar Color para enviar a variable Uniform;
+	glm::mat4 rootTorso(1.0);
+	glm::mat4 jointaux(1.0);
 
 	while (!mainWindow.getShouldClose())
 	{
@@ -334,7 +697,7 @@ int main()
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		//Limpiar la ventana
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Se agrega limpiar el buffer de profundidad
 		shaderList[0].useShader();
 		uniformModel = shaderList[0].getModelLocation();
@@ -342,97 +705,15 @@ int main()
 		uniformView = shaderList[0].getViewLocation();
 		uniformColor = shaderList[0].getColorLocation();
 
-
-		//CREANDO LA CABINA
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, 7.0f, -4.0f));
-		//aqui está la jerarquía
-		modelaux = model;
-		model = glm::scale(model, glm::vec3(7.0f, 4.0f, 5.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		//la línea de proyección solo se manda una vez a menos que en tiempo de ejecución
 		//se programe cambio entre proyección ortogonal y perspectiva
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-		meshList[0]->RenderMesh();
 
-		//crear la articulación 1
-		model = modelaux;
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion1()), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, glm::radians(135.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-		// Creando el brazo de una grúa
-			//articulacion1 hasta articulación5 sólo son puntos de rotación o articulación, en este caso no dibujaremos esferas que los representen
-
-		//primer brazo que conecta con la cabina
-
-		//para reiniciar la matriz de modelo con valor de la matriz identidad
-		//model = glm::mat4(1.0); en jerarquía rompe la conexión
-		//rotación alrededor de la articulación que une con la cabina
-		model = glm::translate(model, glm::vec3(2.5f, 0.0f, 0.0f));
-		modelaux = model;
-		model = glm::scale(model, glm::vec3(5.0f, 1.0f, 1.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//la línea de proyección solo se manda una vez a menos que en tiempo de ejecución
-		//se programe cambio entre proyección ortogonal y perspectiva
-		color = glm::vec3(1.0f, 0.0f, 1.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
-		meshList[0]->RenderMesh(); //dibuja cubo y pirámide triangular
-		//meshList[3]->RenderMeshGeometry(); //dibuja las figuras geométricas cilindro, cono, pirámide base cuadrangular
-		//sp.render(); //dibuja esfera
-
-		//articulacion 2
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(2.5f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion2()), glm::vec3(0.0f, 0.0f, 1.0f));
-		modelaux = model;
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		sp.render();
-		//segundo brazo
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(0.0f, -2.5f, 0.0f));
-		modelaux = model;
-		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//la línea de proyección solo se manda una vez a menos que en tiempo de ejecución
-		//se programe cambio entre proyección ortogonal y perspectiva
-		color = glm::vec3(0.0f, 1.0f, 0.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
-		meshList[0]->RenderMesh(); //dibuja cubo y pirámide triangular
-
-		model = modelaux;
-
-		//articulación 3 extremo derecho del segundo brazo
-		model = glm::translate(model, glm::vec3(0.0f, -2.5f, 0.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion3()), glm::vec3(0.0f, 0.0f, 1.0f));
-		modelaux = model;
-
-		//dibujar una pequeña esfera
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		sp.render();
-
-		// Crear instancias para completar el brazo y  la cabina. Imporante considerar que la cabina es el nodo padre. 
-		//La cabina y el brazo deben de estar unidos a la cabina 
-
-		//tercer brazo
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(2.5f, -2.5f, 0.0f));
-		modelaux = model;
-		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		color = glm::vec3(0.0f, 1.0f, 0.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color)); //para cambiar el color del objetos
-		meshList[0]->RenderMesh(); //dibuja cubo y pirámide triangular
-
+		DibujarLobo(model, rootTorso, modelaux, jointaux, uniformModel, uniformColor);
 
 		glUseProgram(0);
 		mainWindow.swapBuffers();
 	}
 	return 0;
 }
-
-	
-		
