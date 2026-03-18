@@ -55,7 +55,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	//CREAR VENTANA
-	mainWindow = glfwCreateWindow(width, height, "Practica 4: Modelado Jerarquico", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "Tarea 4: Dibujo de Personaje", NULL, NULL);
 
 	if (!mainWindow)
 	{

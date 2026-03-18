@@ -134,8 +134,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="dibujoPersonaje.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="practica4_conjerarquia_grupo3.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -147,6 +147,8 @@
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
     <None Include="shaders\shadercolor.frag" />
+    <None Include="shaders\shaderpersonaje.frag" />
+    <None Include="shaders\shaderpersonaje.vert" />
     <None Include="shaderverde.vert" />
     <None Include="shaderverdeoscuro.vert" />
   </ItemGroup>

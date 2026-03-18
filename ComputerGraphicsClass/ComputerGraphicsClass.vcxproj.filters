@@ -30,7 +30,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="practica4_conjerarquia_grupo3.cpp">
+    <ClCompile Include="dibujoPersonaje.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,6 +57,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shaderverdeoscuro.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\shaderpersonaje.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\shaderpersonaje.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
