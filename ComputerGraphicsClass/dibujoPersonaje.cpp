@@ -19,8 +19,8 @@ std::vector<Shader>shaderList;
 
 static const char* vShader = "shaders/shader.vert";
 static const char* fShader = "shaders/shader.frag";
-static const char* vShaderColor = "shaders/shadercolor.vert";
-static const char* fShaderColor = "shaders/shadercolor.frag";
+static const char* vShaderColor = "shaders/shaderpersonaje.vert";
+static const char* fShaderColor = "shaders/shaderpersonaje.frag";
 
 void CreateShaders()
 {
@@ -95,7 +95,6 @@ void CrearFiguras()
 	meshColorList.push_back(m4);
 
 	// 5. Triangulo gris
-	// Ajustamos la base del triángulo a -0.5 y 0.5 para que su ancho coincida perfectamente con el del cuadrado
 	GLfloat triangulo_gris[] = {
 		-0.5f, -0.5f, 0.0f,  0.7f, 0.8f, 0.9f,
 		 0.5f, -0.5f, 0.0f,  0.7f, 0.8f, 0.9f,
