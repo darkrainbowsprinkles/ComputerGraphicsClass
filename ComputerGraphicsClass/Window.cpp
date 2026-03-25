@@ -13,26 +13,12 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 {
 	width = windowWidth;
 	height = windowHeight;
-	rotax = 0.0f;
-	rotay = 0.0f;
-	rotaz = 0.0f;
-	articulacion1 = 0.0f;
-	articulacion2 = 0.0f;
-	articulacion3 = 0.0f;
-	articulacion4 = 0.0f;
-	articulacion5 = 0.0f;
-	articulacion6 = 0.0f;
-	llanta1 = 0.0f;
-	llanta2 = 0.0f;
-	llanta3 = 0.0f;
-	llanta4 = 0.0f;
-	pata1_1 = 0.0f; pata1_2 = 0.0f;
-	pata2_1 = 0.0f; pata2_2 = 0.0f;
-	pata3_1 = 0.0f; pata3_2 = 0.0f;
-	pata4_1 = 0.0f; pata4_2 = 0.0f;
-	orejaL = 0.0f; orejaR = 0.0f;
-	colaLobo = 0.0f;
-
+	muevex = 2.0f;
+	rotMandibula = 0.0f;
+	rotPata1 = 0.0f;
+	rotPata2 = 0.0f;
+	rotPata3 = 0.0f;
+	rotPata4 = 0.0f;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -55,7 +41,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	//CREAR VENTANA
-	mainWindow = glfwCreateWindow(width, height, "Tarea 4: Dibujo de Personaje", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "Practica 5: Optimizacion y Carga de Modelos", NULL, NULL);
 
 	if (!mainWindow)
 	{
@@ -98,7 +84,6 @@ void Window::createCallbacks()
 	glfwSetKeyCallback(mainWindow, ManejaTeclado);
 	glfwSetCursorPosCallback(mainWindow, ManejaMouse);
 }
-
 GLfloat Window::getXChange()
 {
 	GLfloat theChange = xChange;
@@ -113,6 +98,9 @@ GLfloat Window::getYChange()
 	return theChange;
 }
 
+
+
+
 void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode)
 {
 	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
@@ -121,79 +109,73 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-
-	
-	if (key == GLFW_KEY_E)
+	if (key == GLFW_KEY_Y)
 	{
-		theWindow->rotax += 10.0;
+		theWindow-> muevex += 1.0;
 	}
-	if (key == GLFW_KEY_R)
+	if (key == GLFW_KEY_U)
 	{
-		theWindow->rotay += 10.0; //rotar sobre el eje y 10 grados
+		theWindow-> muevex -= 1.0;
 	}
-	if (key == GLFW_KEY_T)
-	{
-		theWindow->rotaz += 10.0;
+	if (key == GLFW_KEY_1) 
+	{ 
+		theWindow->rotMandibula += 5.0f; 
+		if (theWindow->rotMandibula > 20.0f) 
+			theWindow->rotMandibula = 20.0f; 
 	}
-	if (key == GLFW_KEY_F)
-	{
-		theWindow->articulacion1 += 10.0;
+	if (key == GLFW_KEY_2) 
+	{ 
+		theWindow->rotMandibula -= 5.0f; 
+		if (theWindow->rotMandibula < -20.0f) 
+			theWindow->rotMandibula = -20.0f; 
 	}
-
-	if (key == GLFW_KEY_G)
-	{
-		theWindow->articulacion2 += 10.0;
+	if (key == GLFW_KEY_3) 
+	{ 
+		theWindow->rotPata1 += 5.0f; 
+		if (theWindow->rotPata1 > 45.0f) 
+			theWindow->rotPata1 = 45.0f; 
 	}
-	if (key == GLFW_KEY_H)
-	{
-		theWindow->articulacion3 += 10.0;
+	if (key == GLFW_KEY_4) 
+	{ 
+		theWindow->rotPata1 -= 5.0f; 
+		if (theWindow->rotPata1 < -45.0f) 
+			theWindow->rotPata1 = -45.0f; 
 	}
-	if (key == GLFW_KEY_J)
-	{
-		theWindow->articulacion4 += 10.0;
+	if (key == GLFW_KEY_5) 
+	{ 
+		theWindow->rotPata2 += 5.0f; 
+		if (theWindow->rotPata2 > 45.0f) 
+			theWindow->rotPata2 = 45.0f; 
 	}
-	if (key == GLFW_KEY_K)
-	{
-		theWindow->articulacion5 += 10.0;
+	if (key == GLFW_KEY_6) 
+	{ 
+		theWindow->rotPata2 -= 5.0f; 
+		if (theWindow->rotPata2 < -45.0f) 
+			theWindow->rotPata2 = -45.0f; 
 	}
-	if (key == GLFW_KEY_L)
-	{
-		theWindow->articulacion6 += 10.0;
+	if (key == GLFW_KEY_7) 
+	{ 
+		theWindow->rotPata3 += 5.0f; 
+		if (theWindow->rotPata3 > 45.0f) 
+			theWindow->rotPata3 = 45.0f; 
 	}
-
-	if (key == GLFW_KEY_Z)
-	{
-		theWindow->llanta1 += 10.0;
+	if (key == GLFW_KEY_8) 
+	{ 
+		theWindow->rotPata3 -= 5.0f; 
+		if (theWindow->rotPata3 < -45.0f) 
+			theWindow->rotPata3 = -45.0f; 
 	}
-	if (key == GLFW_KEY_X)
-	{
-		theWindow->llanta2 += 10.0;
+	if (key == GLFW_KEY_9) 
+	{ 
+		theWindow->rotPata4 += 5.0f; 
+		if (theWindow->rotPata4 > 45.0f) 
+			theWindow->rotPata4 = 45.0f; 
 	}
-	if (key == GLFW_KEY_C)
-	{
-		theWindow->llanta3 += 10.0;
-	}
-	if (key == GLFW_KEY_V)
-	{
-		theWindow->llanta4 += 10.0;
-	}
-
-	if (key == GLFW_KEY_U) theWindow->pata1_1 += 5.0; // Pierna Delantera Izquierda
-	if (key == GLFW_KEY_I) theWindow->pata1_2 += 5.0;
-	if (key == GLFW_KEY_O) theWindow->pata2_1 += 5.0; // Pierna Delantera Derecha
-	if (key == GLFW_KEY_P) theWindow->pata2_2 += 5.0;
-	if (key == GLFW_KEY_N) theWindow->pata3_1 += 5.0; // Pierna Trasera Izquierda
-	if (key == GLFW_KEY_M) theWindow->pata3_2 += 5.0;
-	if (key == GLFW_KEY_1) theWindow->pata4_1 += 5.0; // Pierna Trasera Derecha
-	if (key == GLFW_KEY_2) theWindow->pata4_2 += 5.0;
-	if (key == GLFW_KEY_3) theWindow->orejaL += 5.0; // Oreja Izquierda
-	if (key == GLFW_KEY_4) theWindow->orejaR -= 5.0; // Oreja Derecha
-	if (key == GLFW_KEY_5) theWindow->colaLobo += 5.0; // Articulación 2 de la Cola
-
-	if (key == GLFW_KEY_D && action == GLFW_PRESS)
-	{
-		const char* key_name = glfwGetKeyName(GLFW_KEY_D, 0);
-		//printf("se presiono la tecla: %s\n",key_name);
+	if (key == GLFW_KEY_0) 
+	{ 
+		theWindow->rotPata4 -= 5.0f; 
+		if (theWindow->rotPata4 < -45.0f) 
+			theWindow->rotPata4 = -45.0f; 
 	}
 
 	if (key >= 0 && key < 1024)

@@ -23,25 +23,21 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 	if (keys[GLFW_KEY_W])
 	{
 		position += front * velocity;
-		
 	}
 
 	if (keys[GLFW_KEY_S])
 	{
 		position -= front * velocity;
-		
 	}
 
 	if (keys[GLFW_KEY_A])
 	{
 		position -= right * velocity;
-	
 	}
 
 	if (keys[GLFW_KEY_D])
 	{
 		position += right * velocity;
-		
 	}
 }
 
@@ -69,7 +65,17 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 glm::mat4 Camera::calculateViewMatrix()
 {
 	return glm::lookAt(position, position + front, up);
-	
+}
+
+glm::vec3 Camera::getCameraPosition()
+{
+	return position;
+}
+
+
+glm::vec3 Camera::getCameraDirection()
+{
+	return glm::normalize(front);
 }
 
 void Camera::update()
