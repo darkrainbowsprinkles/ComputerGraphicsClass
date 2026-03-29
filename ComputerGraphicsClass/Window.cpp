@@ -4,6 +4,8 @@ Window::Window()
 {
 	width = 800;
 	height = 600;
+	rotacionCofre = 0.0f;
+	movimientoCoche = 0.0f;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -14,11 +16,9 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	width = windowWidth;
 	height = windowHeight;
 	muevex = 2.0f;
-	rotMandibula = 0.0f;
-	rotPata1 = 0.0f;
-	rotPata2 = 0.0f;
-	rotPata3 = 0.0f;
-	rotPata4 = 0.0f;
+	rotacionLlantas = 0.0f;
+	rotacionCofre = 0.0f;
+	movimientoCoche = 0.0f;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -117,66 +117,49 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow-> muevex -= 1.0;
 	}
+
 	if (key == GLFW_KEY_1) 
 	{ 
-		theWindow->rotMandibula += 5.0f; 
-		if (theWindow->rotMandibula > 20.0f) 
-			theWindow->rotMandibula = 20.0f; 
+		theWindow->rotacionLlantas += 5.0f; 
 	}
 	if (key == GLFW_KEY_2) 
 	{ 
-		theWindow->rotMandibula -= 5.0f; 
-		if (theWindow->rotMandibula < -20.0f) 
-			theWindow->rotMandibula = -20.0f; 
+		theWindow->rotacionLlantas -= 5.0f; 
 	}
+
 	if (key == GLFW_KEY_3) 
 	{ 
-		theWindow->rotPata1 += 5.0f; 
-		if (theWindow->rotPata1 > 45.0f) 
-			theWindow->rotPata1 = 45.0f; 
+		theWindow->rotacionCofre += 5.0f; 
+		if (theWindow->rotacionCofre > 45.0f) 
+			theWindow->rotacionCofre = 45.0f; 
 	}
 	if (key == GLFW_KEY_4) 
 	{ 
-		theWindow->rotPata1 -= 5.0f; 
-		if (theWindow->rotPata1 < -45.0f) 
-			theWindow->rotPata1 = -45.0f; 
+		theWindow->rotacionCofre -= 5.0f; 
+		if (theWindow->rotacionCofre < 0.0f) 
+			theWindow->rotacionCofre = 0.0f; 
 	}
 	if (key == GLFW_KEY_5) 
 	{ 
-		theWindow->rotPata2 += 5.0f; 
-		if (theWindow->rotPata2 > 45.0f) 
-			theWindow->rotPata2 = 45.0f; 
+		theWindow->movimientoCoche -= 0.5f; // Mueve hacia una dirección (adelante/atrás)
 	}
 	if (key == GLFW_KEY_6) 
 	{ 
-		theWindow->rotPata2 -= 5.0f; 
-		if (theWindow->rotPata2 < -45.0f) 
-			theWindow->rotPata2 = -45.0f; 
+		theWindow->movimientoCoche += 0.5f; // Mueve hacia la dirección opuesta
 	}
-	if (key == GLFW_KEY_7) 
-	{ 
-		theWindow->rotPata3 += 5.0f; 
-		if (theWindow->rotPata3 > 45.0f) 
-			theWindow->rotPata3 = 45.0f; 
-	}
-	if (key == GLFW_KEY_8) 
-	{ 
-		theWindow->rotPata3 -= 5.0f; 
-		if (theWindow->rotPata3 < -45.0f) 
-			theWindow->rotPata3 = -45.0f; 
-	}
-	if (key == GLFW_KEY_9) 
-	{ 
-		theWindow->rotPata4 += 5.0f; 
-		if (theWindow->rotPata4 > 45.0f) 
-			theWindow->rotPata4 = 45.0f; 
-	}
-	if (key == GLFW_KEY_0) 
-	{ 
-		theWindow->rotPata4 -= 5.0f; 
-		if (theWindow->rotPata4 < -45.0f) 
-			theWindow->rotPata4 = -45.0f; 
-	}
+
+	//if (key == GLFW_KEY_1) 
+	//{ 
+	//	theWindow->rotMandibula += 5.0f; 
+	//	if (theWindow->rotMandibula > 20.0f) 
+	//		theWindow->rotMandibula = 20.0f; 
+	//}
+	//if (key == GLFW_KEY_2) 
+	//{ 
+	//	theWindow->rotMandibula -= 5.0f; 
+	//	if (theWindow->rotMandibula < -20.0f) 
+	//		theWindow->rotMandibula = -20.0f; 
+	//}
 
 	if (key >= 0 && key < 1024)
 	{

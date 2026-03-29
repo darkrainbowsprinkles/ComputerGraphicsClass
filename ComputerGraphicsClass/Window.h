@@ -14,11 +14,9 @@ public:
 	GLfloat getXChange();
 	GLfloat getYChange();
 	GLfloat getmuevex() { return muevex; }
-	GLfloat getrotMandibula() { return rotMandibula; }
-	GLfloat getrotPata1() { return rotPata1; }
-	GLfloat getrotPata2() { return rotPata2; }
-	GLfloat getrotPata3() { return rotPata3; }
-	GLfloat getrotPata4() { return rotPata4; }
+	GLfloat getRotacionLlantas() { return rotacionLlantas; }
+	GLfloat getRotacionCofre() { return rotacionCofre; }
+	GLfloat getMovimientoCoche() { return movimientoCoche; }
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
@@ -36,6 +34,9 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat muevex;
+	GLfloat rotacionLlantas;
+	GLfloat rotacionCofre;
+	GLfloat movimientoCoche;
 	GLfloat rotMandibula;
 	GLfloat rotPata1;
 	GLfloat rotPata2;

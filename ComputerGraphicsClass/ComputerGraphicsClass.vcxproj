@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="definition.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Shader_m.h" />
@@ -39,9 +40,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh_tn.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="practica5.cpp" />
     <ClCompile Include="Shader_m.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Sphere.cpp" />
