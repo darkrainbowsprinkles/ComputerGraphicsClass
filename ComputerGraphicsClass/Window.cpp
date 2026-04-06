@@ -4,8 +4,6 @@ Window::Window()
 {
 	width = 800;
 	height = 600;
-	rotacionCofre = 0.0f;
-	movimientoCoche = 0.0f;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -16,9 +14,6 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	width = windowWidth;
 	height = windowHeight;
 	muevex = 2.0f;
-	rotacionLlantas = 0.0f;
-	rotacionCofre = 0.0f;
-	movimientoCoche = 0.0f;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -41,7 +36,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	//CREAR VENTANA
-	mainWindow = glfwCreateWindow(width, height, "Practica 5: Optimizacion y Carga de Modelos", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "PracticaXX:Nombre de la practica", NULL, NULL);
 
 	if (!mainWindow)
 	{
@@ -118,48 +113,7 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		theWindow-> muevex -= 1.0;
 	}
 
-	if (key == GLFW_KEY_1) 
-	{ 
-		theWindow->rotacionLlantas += 5.0f; 
-	}
-	if (key == GLFW_KEY_2) 
-	{ 
-		theWindow->rotacionLlantas -= 5.0f; 
-	}
 
-	if (key == GLFW_KEY_3) 
-	{ 
-		theWindow->rotacionCofre += 5.0f; 
-		if (theWindow->rotacionCofre > 45.0f) 
-			theWindow->rotacionCofre = 45.0f; 
-	}
-	if (key == GLFW_KEY_4) 
-	{ 
-		theWindow->rotacionCofre -= 5.0f; 
-		if (theWindow->rotacionCofre < 0.0f) 
-			theWindow->rotacionCofre = 0.0f; 
-	}
-	if (key == GLFW_KEY_5) 
-	{ 
-		theWindow->movimientoCoche -= 0.5f; // Mueve hacia una dirección (adelante/atrás)
-	}
-	if (key == GLFW_KEY_6) 
-	{ 
-		theWindow->movimientoCoche += 0.5f; // Mueve hacia la dirección opuesta
-	}
-
-	//if (key == GLFW_KEY_1) 
-	//{ 
-	//	theWindow->rotMandibula += 5.0f; 
-	//	if (theWindow->rotMandibula > 20.0f) 
-	//		theWindow->rotMandibula = 20.0f; 
-	//}
-	//if (key == GLFW_KEY_2) 
-	//{ 
-	//	theWindow->rotMandibula -= 5.0f; 
-	//	if (theWindow->rotMandibula < -20.0f) 
-	//		theWindow->rotMandibula = -20.0f; 
-	//}
 
 	if (key >= 0 && key < 1024)
 	{

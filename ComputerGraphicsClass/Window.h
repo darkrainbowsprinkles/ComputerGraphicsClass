@@ -14,9 +14,6 @@ public:
 	GLfloat getXChange();
 	GLfloat getYChange();
 	GLfloat getmuevex() { return muevex; }
-	GLfloat getRotacionLlantas() { return rotacionLlantas; }
-	GLfloat getRotacionCofre() { return rotacionCofre; }
-	GLfloat getMovimientoCoche() { return movimientoCoche; }
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
@@ -34,14 +31,6 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat muevex;
-	GLfloat rotacionLlantas;
-	GLfloat rotacionCofre;
-	GLfloat movimientoCoche;
-	GLfloat rotMandibula;
-	GLfloat rotPata1;
-	GLfloat rotPata2;
-	GLfloat rotPata3;
-	GLfloat rotPata4;
 	bool mouseFirstMoved;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);

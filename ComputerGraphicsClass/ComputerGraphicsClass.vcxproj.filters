@@ -18,6 +18,9 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommonValues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="definition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,10 +42,10 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Window.h">
+    <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
+    <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,6 +62,12 @@
     <None Include="shaders\shader_m.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shaders\shader_texture.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\shader_texture.vert">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="shaders\skybox.frag">
       <Filter>Resource Files</Filter>
     </None>
@@ -67,10 +76,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Mesh_tn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="practica6.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Shader_m.cpp">
@@ -82,13 +97,10 @@
     <ClCompile Include="Sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
