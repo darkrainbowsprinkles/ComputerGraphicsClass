@@ -41,7 +41,6 @@ Texture plainTexture;
 Texture pisoTexture;
 Texture dadoTexture;
 Texture logofiTexture;
-Texture dadoEmocionesTexture;
 
 Model Kitt_M;
 Model Llanta_M;
@@ -203,42 +202,42 @@ void CrearDado()
 	GLfloat cubo_vertices[] = {
 		// front
 		//x		y		z		S		T			NX		NY		NZ
-		-0.5f, -0.5f,  0.5f,	0.33f,  0.75f,		0.0f,	0.0f,	-1.0f,	//0
-		0.5f, -0.5f,  0.5f,		0.66f,	0.75f,		0.0f,	0.0f,	-1.0f,	//1
-		0.5f,  0.5f,  0.5f,		0.66f,	1.0f,		0.0f,	0.0f,	-1.0f,	//2
-		-0.5f,  0.5f,  0.5f,	0.33f,	1.0f,		0.0f,	0.0f,	-1.0f,	//3
+		-0.5f, -0.5f,  0.5f,	0.33f,  0.5f,		0.0f,	0.0f,	-1.0f,	//0
+		0.5f, -0.5f,  0.5f,		0.66f,	0.5f,		0.0f,	0.0f,	-1.0f,	//1
+		0.5f,  0.5f,  0.5f,		0.66f,	0.75f,		0.0f,	0.0f,	-1.0f,	//2
+		-0.5f,  0.5f,  0.5f,	0.33f,	0.75f,		0.0f,	0.0f,	-1.0f,	//3
 		// right
 		//x		y		z		S		T
-		0.5f, -0.5f,  0.5f,	    0.33f,  0.5f,		-1.0f,	0.0f,	0.0f,
-		0.5f, -0.5f,  -0.5f,	0.66f,	0.5f,		-1.0f,	0.0f,	0.0f,
-		0.5f,  0.5f,  -0.5f,	0.66f,	0.75f,	    -1.0f,	0.0f,	0.0f,
-		0.5f,  0.5f,  0.5f,	    0.33f,  0.75f,		-1.0f,	0.0f,	0.0f,
+		0.5f, -0.5f,  0.5f,	    0.66f,  0.5f,		-1.0f,	0.0f,	0.0f,
+		0.5f, -0.5f,  -0.5f,	1.0f,	0.5f,		-1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  -0.5f,	1.0f,	0.75f,	    -1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  0.5f,	    0.66f,  0.75f,		-1.0f,	0.0f,	0.0f,
 		// back
-		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f,		0.0f,	0.0f,	1.0f,
-		0.5f, -0.5f, -0.5f,		1.0f,	0.0f,		0.0f,	0.0f,	1.0f,
-		0.5f,  0.5f, -0.5f,		1.0f,	1.0f,		0.0f,	0.0f,	1.0f,
-		-0.5f,  0.5f, -0.5f,	0.0f,	1.0f,		0.0f,	0.0f,	1.0f,
+		-0.5f, -0.5f, -0.5f,	0.66f,  0.0f,		0.0f,	0.0f,	1.0f,
+		0.5f, -0.5f, -0.5f,		0.33f,	0.0f,		0.0f,	0.0f,	1.0f,
+		0.5f,  0.5f, -0.5f,		0.33f,	0.25f,		0.0f,	0.0f,	1.0f,
+		-0.5f,  0.5f, -0.5f,	0.66f,	0.25f,		0.0f,	0.0f,	1.0f,
 
 		// left
 		//x		y		z		S		T
-		-0.5f, -0.5f,  -0.5f,	0.0f,  0.0f,		1.0f,	0.0f,	0.0f,
-		-0.5f, -0.5f,  0.5f,	1.0f,	0.0f,		1.0f,	0.0f,	0.0f,
-		-0.5f,  0.5f,  0.5f,	1.0f,	1.0f,		1.0f,	0.0f,	0.0f,
-		-0.5f,  0.5f,  -0.5f,	0.0f,	1.0f,		1.0f,	0.0f,	0.0f,
+		-0.5f, -0.5f,  -0.5f,	0.0f,  0.5f,		1.0f,	0.0f,	0.0f,
+		-0.5f, -0.5f,  0.5f,	0.33f,	0.5f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  0.5f,	0.33f,	0.75f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  -0.5f,	0.0f,	0.75f,		1.0f,	0.0f,	0.0f,
 
 		// bottom
 		//x		y		z		S		T
-		-0.5f, -0.5f,  0.5f,	0.0f,  0.5f,		0.0f,	1.0f,	0.0f,
-		0.5f,  -0.5f,  0.5f,	0.33f,  0.5f,		0.0f,	1.0f,	0.0f,
-		 0.5f,  -0.5f,  -0.5f,	0.33f,  0.75f,		0.0f,	1.0f,	0.0f,
-		-0.5f, -0.5f,  -0.5f,	0.0f,	0.75f,		0.0f,	1.0f,	0.0f,
+		-0.5f, -0.5f,  0.5f,	0.66f,  0.25f,		0.0f,	1.0f,	0.0f,
+		0.5f,  -0.5f,  0.5f,	0.33f,  0.25f,		0.0f,	1.0f,	0.0f,
+		 0.5f,  -0.5f,  -0.5f,	0.33f,  0.5f,		0.0f,	1.0f,	0.0f,
+		-0.5f, -0.5f,  -0.5f,	0.66f,	0.5f,		0.0f,	1.0f,	0.0f,
 
 		//UP
 		 //x		y		z		S		T
-		 -0.5f, 0.5f,  0.5f,	0.66f,	0.75f,		0.0f,	-1.0f,	0.0f,
-		 0.5f,  0.5f,  0.5f,	1.0f,	0.5f,		0.0f,	-1.0f,	0.0f,
-		  0.5f, 0.5f,  -0.5f,	1.0f,	1.75f,		0.0f,	-1.0f,	0.0f,
-		 -0.5f, 0.5f,  -0.5f,	0.66f,	1.0f,		0.0f,	-1.0f,	0.0f,
+		 -0.5f, 0.5f,  0.5f,	0.33f,	0.75f,		0.0f,	-1.0f,	0.0f,
+		 0.5f,  0.5f,  0.5f,	0.66f,	0.75f,		0.0f,	-1.0f,	0.0f,
+		  0.5f, 0.5f,  -0.5f,	0.66f,	1.0f,		0.0f,	-1.0f,	0.0f,
+		 -0.5f, 0.5f,  -0.5f,	0.33f,	1.0f,		0.0f,	-1.0f,	0.0f,
 
 	};
 
@@ -269,19 +268,17 @@ int main()
 	plainTexture.LoadTextureA();
 	pisoTexture = Texture("Textures/piso.tga");
 	pisoTexture.LoadTextureA();
-	dadoTexture = Texture("Textures/DadoEmociones.png");
+	dadoTexture = Texture("Textures/DadoEmociones.jpg");
 	dadoTexture.LoadTextureA();
 	logofiTexture = Texture("Textures/escudo_fi_color.tga");
 	logofiTexture.LoadTextureA();
-	dadoEmocionesTexture = Texture("Textures/DadoEmociones.jpg");
-	dadoEmocionesTexture.LoadTexture();
 	
 	Kitt_M = Model();
 	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
 	Llanta_M = Model();
 	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
 	Dado_M = Model();
-	Dado_M.LoadModel("Models/DadoEmocion.fbx");
+	Dado_M.LoadModel("Models/DadoEmociones.fbx");
 
 	
 	std::vector<std::string> skyboxFaces;
@@ -354,9 +351,10 @@ int main()
 		//Dado importado
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(-3.0f, 3.0f, -2.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		dadoEmocionesTexture.UseTexture();
+		dadoTexture.UseTexture();
 		Dado_M.RenderModel();
 		
 
@@ -368,49 +366,49 @@ int main()
 		y tener texturizadas las 4 llantas (diferenciar caucho y rin)  y 
 		texturizar el logo de la Facultad de ingeniería en el cofre de su propio modelo de coche
 	
-		*/
-		//Instancia del coche 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex() , -0.5f, -3.0f));
-		modelaux = model;
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Kitt_M.RenderModel();
+		//*/
+		////Instancia del coche 
+		//model = glm::mat4(1.0);
+		//model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex() , -0.5f, -3.0f));
+		//modelaux = model;
+		//model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Kitt_M.RenderModel();
 
-		//Llanta delantera izquierda
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta delantera izquierda
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 
-		//Llanta trasera izquierda
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta trasera izquierda
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 
-		//Llanta delantera derecha
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta delantera derecha
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
+		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 
-		//Llanta trasera derecha
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta trasera derecha
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
+		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 
 		glUseProgram(0);
 
