@@ -45,7 +45,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Mesh_tn.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="practica6.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader_m.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Sphere.cpp" />

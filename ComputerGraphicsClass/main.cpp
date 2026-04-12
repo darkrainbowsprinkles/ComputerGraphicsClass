@@ -41,10 +41,16 @@ Texture plainTexture;
 Texture pisoTexture;
 Texture dadoTexture;
 Texture logofiTexture;
+Texture octaedroTexture;
+Texture carroTexture;
+Texture llantaTexture;
 
 Model Kitt_M;
 Model Llanta_M;
 Model Dado_M;
+Model chasis;
+Model cofre;
+Model llanta;
 
 Skybox skybox;
 
@@ -247,6 +253,63 @@ void CrearDado()
 
 }
 
+void CrearOctaedro()
+{
+	unsigned int indices[24];
+	for (int i = 0; i < 24; i++) {
+		indices[i] = i;
+	}
+
+	GLfloat vertices[] = {
+		// x      y      z       u      v       nx    ny    nz
+		// Cara 1: Dendro
+		0.0f,  0.5f,  0.0f,   0.5f,  0.75f,   0.0f, 0.0f, 0.0f, // Top
+		0.0f,  0.0f,  0.5f,   0.25f, 0.5f,    0.0f, 0.0f, 0.0f, // Front
+		0.5f,  0.0f,  0.0f,   0.75f, 0.5f,    0.0f, 0.0f, 0.0f, // Right
+
+		// Cara 2: Cryo
+		0.0f,  0.5f,  0.0f,   0.5f,  0.75f,   0.0f, 0.0f, 0.0f, // Top
+		0.5f,  0.0f,  0.0f,   0.75f, 0.5f,    0.0f, 0.0f, 0.0f, // Right
+		0.0f,  0.0f, -0.5f,   1.0f,  0.75f,   0.0f, 0.0f, 0.0f, // Back
+
+		// Cara 3: Electro
+		0.0f,  0.5f,  0.0f,   0.75f, 1.0f,    0.0f, 0.0f, 0.0f, // Top
+		0.0f,  0.0f, -0.5f,   1.0f,  0.75f,   0.0f, 0.0f, 0.0f, // Back
+		-0.5f,  0.0f,  0.0f,   0.5f,  0.75f,   0.0f, 0.0f, 0.0f, // Left
+
+		// Cara 4: Geo
+		0.0f,  0.5f,  0.0f,   0.5f,  0.75f,   0.0f, 0.0f, 0.0f, // Top
+		-0.5f,  0.0f,  0.0f,   0.0f,  0.75f,   0.0f, 0.0f, 0.0f, // Left
+		0.0f,  0.0f,  0.5f,   0.25f, 0.5f,    0.0f, 0.0f, 0.0f, // Front
+
+		// Cara 5: Hydro
+		0.0f, -0.5f,  0.0f,   0.5f,  0.25f,   0.0f, 0.0f, 0.0f, // Bottom
+		0.5f,  0.0f,  0.0f,   0.75f, 0.5f,    0.0f, 0.0f, 0.0f, // Right
+		0.0f,  0.0f,  0.5f,   0.25f, 0.5f,    0.0f, 0.0f, 0.0f, // Front
+
+		// Cara 6: Anemo
+		0.0f, -0.5f,  0.0f,   0.5f,  0.25f,   0.0f, 0.0f, 0.0f, // Bottom
+		0.0f,  0.0f, -0.5f,   1.0f,  0.25f,   0.0f, 0.0f, 0.0f, // Back
+		0.5f,  0.0f,  0.0f,   0.75f, 0.5f,    0.0f, 0.0f, 0.0f, // Right
+
+		// Cara 7: Cafe vacio 
+		0.0f, -0.5f,  0.0f,   0.75f, 0.0f,    0.0f, 0.0f, 0.0f, // Bottom
+		-0.5f,  0.0f,  0.0f,   1.0f,  0.25f,   0.0f, 0.0f, 0.0f, // Left
+		 0.0f,  0.0f, -0.5f,   0.5f,  0.25f,   0.0f, 0.0f, 0.0f, // Back
+
+		// Cara 8: Pyro
+		0.0f, -0.5f,  0.0f,   0.5f,  0.25f,   0.0f, 0.0f, 0.0f, // Bottom
+		0.0f,  0.0f,  0.5f,   0.25f, 0.5f,    0.0f, 0.0f, 0.0f, // Front
+		-0.5f,  0.0f,  0.0f,   0.0f,  0.25f,   0.0f, 0.0f, 0.0f  // Left
+	};
+
+	calcAverageNormals(indices, 24, vertices, 192, 8, 5);
+
+	Mesh* dado8 = new Mesh();
+	dado8->CreateMesh(vertices, indices, 192, 24);
+	meshList.push_back(dado8);
+}
+
 
 
 int main()
@@ -256,6 +319,7 @@ int main()
 
 	CreateObjects();
 	CrearDado();
+	CrearOctaedro();
 	CreateShaders();
 
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
@@ -272,15 +336,22 @@ int main()
 	dadoTexture.LoadTextureA();
 	logofiTexture = Texture("Textures/escudo_fi_color.tga");
 	logofiTexture.LoadTextureA();
-	
-	Kitt_M = Model();
-	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
-	Llanta_M = Model();
-	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
+	octaedroTexture = Texture("Textures/OctaedroTextura.jpg");
+	octaedroTexture.LoadTextureA();
+	carroTexture = Texture("Textures/Carro1.jpg");
+	carroTexture.LoadTextureA();
+	llantaTexture = Texture("Textures/Llanta.jpg");
+	llantaTexture.LoadTextureA();
+
 	Dado_M = Model();
 	Dado_M.LoadModel("Models/DadoEmociones.fbx");
+	chasis = Model();
+	chasis.LoadModel("Models/Chasis.fbx");
+	cofre = Model();
+	cofre.LoadModel("Models/Cofre.fbx");
+	llanta = Model();
+	llanta.LoadModel("Models/Llanta.fbx");
 
-	
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
@@ -337,78 +408,83 @@ int main()
 		meshList[2]->RenderMesh();
 
 
-		//Dado de Opengl
-		//Ejercicio 1: Texturizar su cubo con la imagen dado_animales ya optimizada por ustedes
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-1.5f, 4.5f, -2.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		dadoTexture.UseTexture();
-		meshList[4]->RenderMesh();
-		
-		//Ejercicio 2:Importar el cubo texturizado en el programa de modelado con 
-		//la imagen dado_animales ya optimizada por ustedes
-		
-		//Dado importado
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-3.0f, 3.0f, -2.0f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		dadoTexture.UseTexture();
-		Dado_M.RenderModel();
-		
-
-		
+		////Dado de Opengl
+		////Ejercicio 1: Texturizar su cubo con la imagen dado_animales ya optimizada por ustedes
+		//model = glm::mat4(1.0);
+		//model = glm::translate(model, glm::vec3(-1.5f, 4.5f, -2.0f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//dadoTexture.UseTexture();
+		//meshList[4]->RenderMesh();
+		//
+		////Ejercicio 2:Importar el cubo texturizado en el programa de modelado con 
+		////la imagen dado_animales ya optimizada por ustedes
+		//
+		////Dado importado
+		//model = glm::mat4(1.0);
+		//model = glm::translate(model, glm::vec3(-3.0f, 3.0f, -2.0f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//dadoTexture.UseTexture();
+		//Dado_M.RenderModel();
 		
 		/*Reporte de práctica :
-		Ejercicio 1: Crear un dado de 8 caras y texturizarlo por medio de código
-		Ejercicio 2: Importar el modelo de su coche con sus 4 llantas acomodadas
+		Ejercicio 1: Crear un dado de 8 caras y texturizarlo por medio de código*/
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-1.5f, 4.5f, -2.0f));
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		octaedroTexture.UseTexture();
+		meshList[5]->RenderMesh();
+
+		/*Ejercicio 2: Importar el modelo de su coche con sus 4 llantas acomodadas
 		y tener texturizadas las 4 llantas (diferenciar caucho y rin)  y 
-		texturizar el logo de la Facultad de ingeniería en el cofre de su propio modelo de coche
-	
-		//*/
-		////Instancia del coche 
-		//model = glm::mat4(1.0);
-		//model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex() , -0.5f, -3.0f));
-		//modelaux = model;
-		//model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Kitt_M.RenderModel();
+		texturizar el logo de la Facultad de ingeniería en el cofre de su propio modelo de coche*/
 
-		////Llanta delantera izquierda
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
-		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
+		//Chasis
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		carroTexture.UseTexture();
+		chasis.RenderModel();
 
-		////Llanta trasera izquierda
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
+		//Cofre 
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(-0.95f, 0.4f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		carroTexture.UseTexture();
+		cofre.RenderModel();
 
-		////Llanta delantera derecha
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
-		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
+		//Llanta delantera izquierda
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, 0.7f));
+		modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
 
-		////Llanta trasera derecha
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
-		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
+		//Llanta delantera derecha
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, -0.7f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
+
+		//Llanta trasera izquierda
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, 0.7f));
+		modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
+
+		//Llanta trasera derecha
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, -0.7f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
 
 		glUseProgram(0);
 

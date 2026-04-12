@@ -48,7 +48,7 @@ void Model::RenderModel()
 	for (unsigned int i = 0; i < MeshList.size(); i++)
 	{
 		unsigned int materialIndex = meshTotex[i];
-		if (!materialIndex< TextureList.size()&& TextureList[materialIndex])
+		if (materialIndex < TextureList.size() && TextureList[materialIndex])
 		{
 			TextureList[materialIndex]->UseTexture();
 		}
@@ -125,13 +125,11 @@ void Model::LoadMaterials(const aiScene * scene)
 			aiString path;
 			if (material->GetTexture(aiTextureType_DIFFUSE,0,&path)==AI_SUCCESS)
 			{
-				int idx;
-				std::string filename;
-				if (std::string(path.data).rfind("\\"))
+				std::string filename = std::string(path.data);
+				size_t idx = filename.find_last_of("\\/");
+				if (idx != std::string::npos)
 				{
-					//printf("entre a 1 / \n");
-					idx = std::string(path.data).rfind("\\");//para quitar del path del modelo todo lo que este antes del \ de ubicación de directorio
-					filename = std::string(path.data).substr(idx + 1);
+					filename = filename.substr(idx + 1);
 				}
 				/*else if(std::string(path.data).rfind("\\"))
 				{
@@ -157,15 +155,7 @@ void Model::LoadMaterials(const aiScene * scene)
 					Texture* newTex = new Texture(texPath.c_str());
 					std::string ext = filename.substr(filename.find_last_of('.') + 1);
 
-					bool loaded = false;
-					if (ext == "tga" || ext=="png")
-					{
-						loaded = newTex->LoadTextureA();
-					}
-					else
-					{
-						loaded = newTex->LoadTexture();
-					}
+					bool loaded = newTex->LoadTextureA();
 
 					if (loaded)
 					{
