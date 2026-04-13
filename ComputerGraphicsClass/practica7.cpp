@@ -47,10 +47,15 @@ Texture dirtTexture;
 Texture plainTexture;
 Texture pisoTexture;
 Texture AgaveTexture;
+Texture carroTexture;
+Texture llantaTexture;
 
 Model Kitt_M;
 Model Llanta_M;
 Model Blackhawk_M;
+Model chasis;
+Model cofre;
+Model llanta;
 
 
 Skybox skybox;
@@ -285,6 +290,16 @@ int main()
 	pisoTexture.LoadTextureA();
 	AgaveTexture = Texture("Textures/Agave.tga");
 	AgaveTexture.LoadTextureA();
+	carroTexture = Texture("Textures/Carro1.jpg");
+	carroTexture.LoadTextureA();
+	llantaTexture = Texture("Textures/Llanta.jpg");
+	llantaTexture.LoadTextureA();
+	chasis = Model();
+	chasis.LoadModel("Models/Chasis.fbx");
+	cofre = Model();
+	cofre.LoadModel("Models/Cofre.fbx");
+	llanta = Model();
+	llanta.LoadModel("Models/Llanta.fbx");
 
 	Kitt_M = Model();
 	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
@@ -335,17 +350,26 @@ int main()
 		5.0f);
 	spotLightCount++;
 
-	//luz fija
-	spotLights[1] = SpotLight(0.0f, 1.0f, 0.0f,
+	//luz del coche
+	spotLights[1] = SpotLight(0.0f, 0.0f, 1.0f,
 		1.0f, 2.0f,
-		5.0f, 10.0f, 0.0f,
-		0.0f, -5.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
-		80.0f);
+		5.0f);
 	spotLightCount++;
+
+	////luz fija
+	//spotLights[1] = SpotLight(0.0f, 1.0f, 0.0f,
+	//	1.0f, 1.0f,
+	//	5.0f, 10.0f, 0.0f,
+	//	0.0f, -5.0f, 0.0f,
+	//	1.0f, 0.0f, 0.0f,
+	//	80.0f);
+	//spotLightCount++;
 	
 	//se crean mas luces puntuales y spotlight 
-
+	glm::vec3 poscoche;
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
 	GLuint uniformColor = 0;
@@ -387,7 +411,7 @@ int main()
 			glm::vec3 lowerLight = camera.getCameraPosition();
 		lowerLight.y -= 0.3f;
 		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-		//spotLights[1].SetPos(poscoche + glm::vec(x, y, cofre));
+		spotLights[1].SetPos(poscoche + glm::vec(x, y, cofre));
 
 		//información al shader de fuentes de iluminación
 		shaderList[0].SetDirectionalLight(&mainLight);
@@ -405,64 +429,112 @@ int main()
 
 		meshList[2]->RenderMesh();
 
-		//Instancia del coche 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex(), 0.5f, -3.0f));
-		modelaux = model;
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Kitt_M.RenderModel();
+		////Instancia del coche 
+		//model = glm::mat4(1.0);
+		//model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex(), 0.5f, -3.0f));
+		//modelaux = model;
+		//model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Kitt_M.RenderModel();
 
-		//Llanta delantera izquierda
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta delantera izquierda
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 
-		//Llanta trasera izquierda
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta trasera izquierda
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 
-		//Llanta delantera derecha
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta delantera derecha
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
+		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 
-		//Llanta trasera derecha
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();
+		////Llanta trasera derecha
+		//model = modelaux;
+		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
+		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Llanta_M.RenderModel();
 	
 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 6.0));
-		model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Blackhawk_M.RenderModel();
+		//model = glm::mat4(1.0);
+		//model = glm::translate(model, glm::vec3(0.0f, 5.0f, 6.0));
+		//model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+		//model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//Blackhawk_M.RenderModel();
 
 
+		//model = glm::mat4(1.0);
+		//model = glm::translate(model, glm::vec3(-5.0f, 5.0f, 6.0));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//
+		//meshList[4]->RenderMesh();
+
+		/*Ejercicio 2: Importar el modelo de su coche con sus 4 llantas acomodadas
+y tener texturizadas las 4 llantas (diferenciar caucho y rin)  y
+texturizar el logo de la Facultad de ingeniería en el cofre de su propio modelo de coche*/
+
+//Chasis
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-5.0f, 5.0f, 6.0));
+		model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex(), 0.5f, -3.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		
-		meshList[4]->RenderMesh();
+		carroTexture.UseTexture();
+		chasis.RenderModel();
+
+		//Cofre 
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(-0.95f, 0.4f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		carroTexture.UseTexture();
+		cofre.RenderModel();
+
+		//Llanta delantera izquierda
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, 0.7f));
+		modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
+
+		//Llanta delantera derecha
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, -0.7f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
+
+		//Llanta trasera izquierda
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, 0.7f));
+		modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
+
+		//Llanta trasera derecha
+		modelaux = model;
+		modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, -0.7f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		llantaTexture.UseTexture();
+		llanta.RenderModel();
 
 		//Agave ¿qué sucede si lo renderizan antes del coche y el helicóptero?
 		model = glm::mat4(1.0);
