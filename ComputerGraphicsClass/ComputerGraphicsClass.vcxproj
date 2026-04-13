@@ -19,17 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CommonValues.h" />
-    <ClInclude Include="definition.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Shader_m.h" />
-    <ClInclude Include="Skybox.h" />
-    <ClInclude Include="Sphere.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Window.h" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Mesh_tn.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="practica7.cpp" />
+    <ClCompile Include="Shader_light.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader_light.frag" />
@@ -42,15 +45,22 @@
     <None Include="shaders\skybox.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Mesh_tn.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Shader_m.cpp" />
-    <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="Sphere.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CommonValues.h" />
+    <ClInclude Include="definition.h" />
+    <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Shader_light.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="SpotLight.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -76,13 +86,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

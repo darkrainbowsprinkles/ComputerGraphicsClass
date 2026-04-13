@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CommonValues.h"
 #include <vector>
 #include <string>
 #include<glew.h>
@@ -8,8 +9,7 @@
 #include <gtc\matrix_transform.hpp>
 #include<gtc\type_ptr.hpp>
 #include "Mesh.h"
-#include "Shader_m.h"
-#include "stb_image.h"
+#include "Shader_light.h"
 class Skybox
 {
 public:
