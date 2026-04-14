@@ -1,24 +1,22 @@
 /*
 Práctica 7: Iluminación 1 
 */
-//para cargar imagen
+
 #define STB_IMAGE_IMPLEMENTATION
+
+//para probar el importer
+//#include<assimp/Importer.hpp>
 
 #include <stdio.h>
 #include <string.h>
 #include <cmath>
 #include <vector>
 #include <math.h>
-
 #include <glew.h>
 #include <glfw3.h>
-
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <gtc\type_ptr.hpp>
-//para probar el importer
-//#include<assimp/Importer.hpp>
-
 #include "Window.h"
 #include "Mesh.h"
 #include "Shader_light.h"
@@ -27,14 +25,13 @@ Práctica 7: Iluminación 1
 #include "Sphere.h"
 #include"Model.h"
 #include "Skybox.h"
-
 //para iluminación
 #include "CommonValues.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
-const float toRadians = 3.14159265f / 180.0f;
+#include "practica7.h"
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
@@ -57,31 +54,26 @@ Model chasis;
 Model cofre;
 Model llanta;
 
-
 Skybox skybox;
 
-//materiales
 Material Material_brillante;
 Material Material_opaco;
-
 
 //Sphere cabeza = Sphere(0.5, 20, 20);
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
-static double limitFPS = 1.0 / 60.0;
 
 // luz direccional
 DirectionalLight mainLight;
-//para declarar varias luces de tipo pointlight
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 
-// Vertex Shader
+static double limitFPS = 1.0 / 60.0;
+const float toRadians = 3.14159265f / 180.0f;
+unsigned int pointLightCount = 0;
+unsigned int spotLightCount = 0;
 static const char* vShader = "shaders/shader_light.vert";
-
-// Fragment Shader
 static const char* fShader = "shaders/shader_light.frag";
-
 
 //función de calculo de normales por promedio de vértices 
 void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int verticeCount,
@@ -159,8 +151,6 @@ void CreateObjects()
 		0.0f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
 		0.0f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f, 0.0f, 0.0f,
 		0.0f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f,
-
-
 	};
 	
 	Mesh *obj1 = new Mesh();
@@ -180,11 +170,8 @@ void CreateObjects()
 	meshList.push_back(obj4);
 
 	calcAverageNormals(indices, 12, vertices, 32, 8, 5);
-
 	calcAverageNormals(vegetacionIndices, 12, vegetacionVertices, 64, 8, 5);
-
 }
-
 
 void CreateShaders()
 {
@@ -192,7 +179,6 @@ void CreateShaders()
 	shader1->CreateFromFiles(vShader, fShader);
 	shaderList.push_back(*shader1);
 }
-
 
 void CrearDado()
 {
@@ -264,22 +250,53 @@ void CrearDado()
 	Mesh* dado = new Mesh();
 	dado->CreateMesh(cubo_vertices, cubo_indices, 192, 36);
 	meshList.push_back(dado);
+}
 
+void CreateLights()
+{
+	//luz direccional, sólo 1 y siempre debe de existir
+	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
+		0.3f, 0.3f,
+		0.0f, -1.0f, 0.0f);
+
+	//Declaración de primer luz puntual
+	//pointLights[0] = PointLight(1.0f, 0.0f, 0.0f,
+	//	0.3f, 0.5f,
+	//	-6.0f, 1.5f, 1.5f,
+	//	0.3f, 0.2f, 0.1f);
+	//pointLightCount++;
+
+	//luz fija
+	//spotLights[1] = SpotLight(0.0f, 1.0f, 0.0f,
+	//	1.0f, 1.0f,
+	//	5.0f, 10.0f, 0.0f,
+	//	0.0f, -5.0f, 0.0f,
+	//	1.0f, 0.0f, 0.0f,
+	//	80.0f);
+	//spotLightCount++;
+
+	//linterna
+	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
+		0.0f, 2.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		5.0f);
+	spotLightCount++;
+
+	//faro del coche
+	spotLights[1] = SpotLight(0.0f, 0.0f, 1.0f,
+		1.0f, 2.0f,
+		0.0f, 0.0f, 0.0f,
+		-1.0f, -0.3f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		20.0f);
+	spotLightCount++;
 }
 
 
-
-
-int main()
+void LoadTextures()
 {
-	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
-	mainWindow.Initialise();
-	CreateObjects();
-	CrearDado();
-	CreateShaders();
-
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
-
 	brickTexture = Texture("Textures/brick.png");
 	brickTexture.LoadTextureA();
 	dirtTexture = Texture("Textures/dirt.png");
@@ -294,21 +311,26 @@ int main()
 	carroTexture.LoadTextureA();
 	llantaTexture = Texture("Textures/Llanta.jpg");
 	llantaTexture.LoadTextureA();
+}
+
+void LoadModels()
+{
 	chasis = Model();
 	chasis.LoadModel("Models/Chasis.fbx");
 	cofre = Model();
 	cofre.LoadModel("Models/Cofre.fbx");
 	llanta = Model();
 	llanta.LoadModel("Models/Llanta.fbx");
-
 	Kitt_M = Model();
 	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
 	Llanta_M = Model();
 	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
 	Blackhawk_M = Model();
 	Blackhawk_M.LoadModel("Models/uh60.obj");
-	
+}
 
+void SetSkybox()
+{
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
@@ -316,8 +338,143 @@ int main()
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
-
 	skybox = Skybox(skyboxFaces);
+}
+
+void UpdateDeltaTime()
+{
+	GLfloat now = glfwGetTime();
+	deltaTime = now - lastTime;
+	deltaTime += (now - lastTime) / limitFPS;
+	lastTime = now;
+}
+
+void RegisterUserEvents()
+{
+	glfwPollEvents();
+	camera.keyControl(mainWindow.getsKeys(), deltaTime);
+	camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+}
+
+void ClearWindow(const glm::mat4& projection, GLuint& uniformModel, GLuint& uniformProjection, GLuint& uniformView, GLuint& uniformEyePosition, GLuint& uniformColor)
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+	shaderList[0].UseShader();
+	uniformModel = shaderList[0].GetModelLocation();
+	uniformProjection = shaderList[0].GetProjectionLocation();
+	uniformView = shaderList[0].GetViewLocation();
+	uniformEyePosition = shaderList[0].GetEyePositionLocation();
+	uniformColor = shaderList[0].getColorLocation();
+}
+
+void SetShaderInfo(GLuint& uniformSpecularIntensity, GLuint& uniformShininess, GLuint uniformProjection, glm::mat4& projection, GLuint uniformView, GLuint uniformEyePosition)
+{
+	//información en el shader de intensidad especular y brillo
+	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
+	uniformShininess = shaderList[0].GetShininessLocation();
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
+	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+
+	//información al shader de fuentes de iluminación
+	shaderList[0].SetDirectionalLight(&mainLight);
+	shaderList[0].SetPointLights(pointLights, pointLightCount);
+	shaderList[0].SetSpotLights(spotLights, spotLightCount);
+}
+
+void RenderPiso(glm::mat4& model, GLuint uniformModel, GLuint uniformColor, glm::vec3& color, GLuint uniformSpecularIntensity, GLuint uniformShininess)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+	pisoTexture.UseTexture();
+	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[2]->RenderMesh();
+}
+
+void SetLinterna()
+{
+	glm::vec3 lowerLight = camera.getCameraPosition();
+	lowerLight.y -= 0.3f;
+	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+}
+
+void RenderCoche(glm::mat4& model, glm::vec3& poscoche, GLuint uniformModel, glm::mat4& modelaux, GLuint uniformSpecularIntensity, GLuint uniformShininess)
+{
+	poscoche = glm::vec3(mainWindow.getmuevex(), 0.0f, 0.0f);
+	spotLights[1].SetPos(poscoche + glm::vec3(-2.0f, 0.4f, 0.0f));
+
+	//Chasis
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+	model = glm::translate(model, poscoche);
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	carroTexture.UseTexture();
+	chasis.RenderModel();
+
+	//Cofre 
+	modelaux = model;
+	modelaux = glm::translate(modelaux, glm::vec3(-0.95f, 0.4f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+	carroTexture.UseTexture();
+	cofre.RenderModel();
+
+	//Llanta delantera izquierda
+	modelaux = model;
+	modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, 0.7f));
+	modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+	llantaTexture.UseTexture();
+	llanta.RenderModel();
+
+	//Llanta delantera derecha
+	modelaux = model;
+	modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, -0.7f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+	llantaTexture.UseTexture();
+	llanta.RenderModel();
+
+	//Llanta trasera izquierda
+	modelaux = model;
+	modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, 0.7f));
+	modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+	llantaTexture.UseTexture();
+	llanta.RenderModel();
+
+	//Llanta trasera derecha
+	modelaux = model;
+	modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, -0.7f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+	llantaTexture.UseTexture();
+	llanta.RenderModel();
+}
+
+void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess)
+{
+	//Agave ¿qué sucede si lo renderizan antes del coche y el helicóptero?
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, 1.0f, -4.0f));
+	model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//blending: transparencia o traslucidez
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	AgaveTexture.UseTexture();
+	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[3]->RenderMesh();
+	glDisable(GL_BLEND);
+}
+
+int main()
+{
+	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
+	mainWindow.Initialise();
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
 
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
@@ -325,233 +482,32 @@ int main()
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-
-
-	//luz direccional, sólo 1 y siempre debe de existir
-	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.3f, 0.3f,
-		0.0f, -1.0f, 0.0f);
-	//contador de luces puntuales
-	unsigned int pointLightCount = 0;
-	//Declaración de primer luz puntual
-	pointLights[0] = PointLight(1.0f, 0.0f, 0.0f,
-		0.3f, 0.5f,
-		-6.0f, 1.5f, 1.5f,
-		0.3f, 0.2f, 0.1f);
-	pointLightCount++;
-
-	unsigned int spotLightCount = 0;
-	//linterna
-	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
-		0.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		5.0f);
-	spotLightCount++;
-
-	//luz del coche
-	spotLights[1] = SpotLight(0.0f, 0.0f, 1.0f,
-		1.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		5.0f);
-	spotLightCount++;
-
-	////luz fija
-	//spotLights[1] = SpotLight(0.0f, 1.0f, 0.0f,
-	//	1.0f, 1.0f,
-	//	5.0f, 10.0f, 0.0f,
-	//	0.0f, -5.0f, 0.0f,
-	//	1.0f, 0.0f, 0.0f,
-	//	80.0f);
-	//spotLightCount++;
-	
-	//se crean mas luces puntuales y spotlight 
 	glm::vec3 poscoche;
-	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
-		uniformSpecularIntensity = 0, uniformShininess = 0;
+	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0, uniformSpecularIntensity = 0, uniformShininess = 0;
 	GLuint uniformColor = 0;
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
-	////Loop mientras no se cierra la ventana
+
+	CreateObjects();
+	CrearDado();
+	CreateShaders();
+	LoadTextures();
+	LoadModels();
+	SetSkybox();
+	CreateLights();
+
 	while (!mainWindow.getShouldClose())
 	{
-		GLfloat now = glfwGetTime();
-		deltaTime = now - lastTime;
-		deltaTime += (now - lastTime) / limitFPS;
-		lastTime = now;
+		UpdateDeltaTime();
+		RegisterUserEvents();
+		ClearWindow(projection, uniformModel, uniformProjection, uniformView, uniformEyePosition, uniformColor);
+		SetShaderInfo(uniformSpecularIntensity, uniformShininess, uniformProjection, projection, uniformView, uniformEyePosition);
 
-		//Recibir eventos del usuario
-		glfwPollEvents();
-		camera.keyControl(mainWindow.getsKeys(), deltaTime);
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
-
-		// Clear the window
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
-		shaderList[0].UseShader();
-		uniformModel = shaderList[0].GetModelLocation();
-		uniformProjection = shaderList[0].GetProjectionLocation();
-		uniformView = shaderList[0].GetViewLocation();
-		uniformEyePosition = shaderList[0].GetEyePositionLocation();
-		uniformColor = shaderList[0].getColorLocation();
-		
-		//información en el shader de intensidad especular y brillo
-		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
-		uniformShininess = shaderList[0].GetShininessLocation();
-
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-
-		// luz ligada a la cámara de tipo flash
-		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
-			glm::vec3 lowerLight = camera.getCameraPosition();
-		lowerLight.y -= 0.3f;
-		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-		spotLights[1].SetPos(poscoche + glm::vec(x, y, cofre));
-
-		//información al shader de fuentes de iluminación
-		shaderList[0].SetDirectionalLight(&mainLight);
-		shaderList[0].SetPointLights(pointLights, pointLightCount);
-		shaderList[0].SetSpotLights(spotLights, spotLightCount);
-
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-
-		pisoTexture.UseTexture();
-		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-
-		meshList[2]->RenderMesh();
-
-		////Instancia del coche 
-		//model = glm::mat4(1.0);
-		//model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex(), 0.5f, -3.0f));
-		//modelaux = model;
-		//model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Kitt_M.RenderModel();
-
-		////Llanta delantera izquierda
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
-		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
-
-		////Llanta trasera izquierda
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
-
-		////Llanta delantera derecha
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
-		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
-
-		////Llanta trasera derecha
-		//model = modelaux;
-		//model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
-		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Llanta_M.RenderModel();
-	
-
-		//model = glm::mat4(1.0);
-		//model = glm::translate(model, glm::vec3(0.0f, 5.0f, 6.0));
-		//model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-		//model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//Blackhawk_M.RenderModel();
-
-
-		//model = glm::mat4(1.0);
-		//model = glm::translate(model, glm::vec3(-5.0f, 5.0f, 6.0));
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//
-		//meshList[4]->RenderMesh();
-
-		/*Ejercicio 2: Importar el modelo de su coche con sus 4 llantas acomodadas
-y tener texturizadas las 4 llantas (diferenciar caucho y rin)  y
-texturizar el logo de la Facultad de ingeniería en el cofre de su propio modelo de coche*/
-
-//Chasis
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex(), 0.5f, -3.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		carroTexture.UseTexture();
-		chasis.RenderModel();
-
-		//Cofre 
-		modelaux = model;
-		modelaux = glm::translate(modelaux, glm::vec3(-0.95f, 0.4f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		carroTexture.UseTexture();
-		cofre.RenderModel();
-
-		//Llanta delantera izquierda
-		modelaux = model;
-		modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, 0.7f));
-		modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		llantaTexture.UseTexture();
-		llanta.RenderModel();
-
-		//Llanta delantera derecha
-		modelaux = model;
-		modelaux = glm::translate(modelaux, glm::vec3(-1.65f, -0.65f, -0.7f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		llantaTexture.UseTexture();
-		llanta.RenderModel();
-
-		//Llanta trasera izquierda
-		modelaux = model;
-		modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, 0.7f));
-		modelaux = glm::rotate(modelaux, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		llantaTexture.UseTexture();
-		llanta.RenderModel();
-
-		//Llanta trasera derecha
-		modelaux = model;
-		modelaux = glm::translate(modelaux, glm::vec3(1.25f, -0.65f, -0.7f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		llantaTexture.UseTexture();
-		llanta.RenderModel();
-
-		//Agave ¿qué sucede si lo renderizan antes del coche y el helicóptero?
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -4.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		
-		//blending: transparencia o traslucidez
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		AgaveTexture.UseTexture();
-		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		meshList[3]->RenderMesh();
-		glDisable(GL_BLEND);
+		SetLinterna();
+		RenderPiso(model, uniformModel, uniformColor, color, uniformSpecularIntensity, uniformShininess);
+		RenderCoche(model, poscoche, uniformModel, modelaux, uniformSpecularIntensity, uniformShininess);
+		RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
 
 		glUseProgram(0);
-
 		mainWindow.swapBuffers();
 	}
 
