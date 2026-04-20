@@ -31,7 +31,7 @@ Práctica 7: Iluminación 1
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
-#include "practica7.h"
+#include "main.h"
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
