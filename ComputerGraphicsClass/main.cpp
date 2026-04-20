@@ -46,6 +46,7 @@ Texture pisoTexture;
 Texture AgaveTexture;
 Texture carroTexture;
 Texture llantaTexture;
+Texture lamparaTexture;
 
 Model Kitt_M;
 Model Llanta_M;
@@ -53,6 +54,7 @@ Model Blackhawk_M;
 Model chasis;
 Model cofre;
 Model llanta;
+Model lampara;
 
 Skybox skybox;
 
@@ -254,26 +256,9 @@ void CrearDado()
 
 void CreateLights()
 {
-	//luz direccional, sólo 1 y siempre debe de existir
-	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.3f, 0.3f,
-		0.0f, -1.0f, 0.0f);
-
-	//Declaración de primer luz puntual
-	//pointLights[0] = PointLight(1.0f, 0.0f, 0.0f,
-	//	0.3f, 0.5f,
-	//	-6.0f, 1.5f, 1.5f,
-	//	0.3f, 0.2f, 0.1f);
-	//pointLightCount++;
-
-	//luz fija
-	//spotLights[1] = SpotLight(0.0f, 1.0f, 0.0f,
-	//	1.0f, 1.0f,
-	//	5.0f, 10.0f, 0.0f,
-	//	0.0f, -5.0f, 0.0f,
-	//	1.0f, 0.0f, 0.0f,
-	//	80.0f);
-	//spotLightCount++;
+	mainLight = DirectionalLight(0.6f, 0.3f, 0.5f,  
+		0.05f, 0.2f,                                
+		-1.0f, -0.2f, -0.5f);                       
 
 	//linterna
 	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
@@ -292,6 +277,22 @@ void CreateLights()
 		1.0f, 0.0f, 0.0f,
 		20.0f);
 	spotLightCount++;
+
+	//luz de helicoptero 
+	spotLights[2] = SpotLight(1.0f, 1.0f, 0.0f, 
+		1.0f, 2.0f,
+		0.0f, 0.0f, 0.0f, 
+		0.0f, -1.0f, 0.0f, 
+		1.0f, 0.0f, 0.0f,
+		15.0f);
+	spotLightCount++;
+
+	//luz de lampara
+	pointLights[0] = PointLight(1.0f, 1.0f, 1.0f,
+		0.8f, 2.0f,     
+		0.0f, 0.0f, 0.0f,
+		0.3f, 0.1f, 0.05f); 
+	pointLightCount++;
 }
 
 
@@ -311,6 +312,8 @@ void LoadTextures()
 	carroTexture.LoadTextureA();
 	llantaTexture = Texture("Textures/Llanta.jpg");
 	llantaTexture.LoadTextureA();
+	lamparaTexture = Texture("Textures/Lampara.png");
+	lamparaTexture.LoadTextureA();
 }
 
 void LoadModels()
@@ -327,6 +330,8 @@ void LoadModels()
 	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
 	Blackhawk_M = Model();
 	Blackhawk_M.LoadModel("Models/uh60.obj");
+	lampara = Model();
+	lampara.LoadModel("Models/lampara.fbx");
 }
 
 void SetSkybox()
@@ -403,15 +408,11 @@ void SetLinterna()
 	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 }
 
-void RenderCoche(glm::mat4& model, glm::vec3& poscoche, GLuint uniformModel, glm::mat4& modelaux, GLuint uniformSpecularIntensity, GLuint uniformShininess)
+void RenderCoche(glm::mat4& model, GLuint uniformModel, glm::mat4& modelaux, GLuint uniformSpecularIntensity, GLuint uniformShininess)
 {
-	poscoche = glm::vec3(mainWindow.getmuevex(), 0.0f, 0.0f);
-	spotLights[1].SetPos(poscoche + glm::vec3(-2.0f, 0.4f, 0.0f));
-
 	//Chasis
 	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-	model = glm::translate(model, poscoche);
+	model = glm::translate(model, glm::vec3(mainWindow.getmuevex(), 0.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	carroTexture.UseTexture();
 	chasis.RenderModel();
@@ -422,6 +423,10 @@ void RenderCoche(glm::mat4& model, glm::vec3& poscoche, GLuint uniformModel, glm
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 	carroTexture.UseTexture();
 	cofre.RenderModel();
+
+	// Faro 
+	glm::mat4 lightModel = glm::translate(modelaux, glm::vec3(-1.05f, 0.0f, 0.0f));
+	spotLights[1].SetPos(glm::vec3(lightModel[3]));
 
 	//Llanta delantera izquierda
 	modelaux = model;
@@ -454,6 +459,20 @@ void RenderCoche(glm::mat4& model, glm::vec3& poscoche, GLuint uniformModel, glm
 	llanta.RenderModel();
 }
 
+void RenderHelicoptero(glm::mat4& model, GLuint uniformModel)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(mainWindow.getmuevex2(), 5.0f, 6.0f));
+
+	spotLights[2].SetPos(glm::vec3(model[3]));
+
+	model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+	model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	Blackhawk_M.RenderModel();
+}
+
 void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess)
 {
 	//Agave ¿qué sucede si lo renderizan antes del coche y el helicóptero?
@@ -470,6 +489,21 @@ void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIn
 	glDisable(GL_BLEND);
 }
 
+void RenderLampara(glm::mat4& model, GLuint uniformModel)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, -0.5f, -10.0f));
+
+	glm::mat4 lightModel = glm::translate(model, glm::vec3(1.3f, 7.0f, 0.0f)); 
+	pointLights[0].SetPos(glm::vec3(lightModel[3]));
+
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	lamparaTexture.UseTexture();
+	lampara.RenderModel();
+}
+
 int main()
 {
 	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
@@ -482,7 +516,6 @@ int main()
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-	glm::vec3 poscoche;
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0, uniformSpecularIntensity = 0, uniformShininess = 0;
 	GLuint uniformColor = 0;
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
@@ -504,7 +537,9 @@ int main()
 
 		SetLinterna();
 		RenderPiso(model, uniformModel, uniformColor, color, uniformSpecularIntensity, uniformShininess);
-		RenderCoche(model, poscoche, uniformModel, modelaux, uniformSpecularIntensity, uniformShininess);
+		RenderCoche(model, uniformModel, modelaux, uniformSpecularIntensity, uniformShininess);
+		RenderHelicoptero(model, uniformModel);
+		RenderLampara(model, uniformModel);
 		RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
 
 		glUseProgram(0);

@@ -14,6 +14,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	width = windowWidth;
 	height = windowHeight;
 	muevex = 2.0f;
+	muevex2 = 0.0f; 
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -94,8 +95,6 @@ GLfloat Window::getYChange()
 }
 
 
-
-
 void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode)
 {
 	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
@@ -106,11 +105,19 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	}
 	if (key == GLFW_KEY_Y)
 	{
-		theWindow-> muevex += 1.0;
+		theWindow-> muevex -= 1.0;
 	}
 	if (key == GLFW_KEY_U)
 	{
-		theWindow-> muevex -= 1.0;
+		theWindow-> muevex += 1.0;
+	}
+	if (key == GLFW_KEY_I)
+	{
+		theWindow-> muevex2 -= 1.0; 
+	}
+	if (key == GLFW_KEY_O) 
+	{
+		theWindow-> muevex2 += 1.0; 
 	}
 
 
