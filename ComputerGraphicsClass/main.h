@@ -12,6 +12,8 @@ void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIn
 
 void RenderHelicoptero(glm::mat4& model, GLuint uniformModel);
 
+void HandleFaroCoche(glm::mat4& modelaux);
+
 void UpdateDeltaTime();
 
 void ClearWindow(const glm::mat4& projection, GLuint& uniformModel, GLuint& uniformProjection, GLuint& uniformView, GLuint& uniformEyePosition, GLuint& uniformColor);

@@ -47,6 +47,7 @@ Texture AgaveTexture;
 Texture carroTexture;
 Texture llantaTexture;
 Texture lamparaTexture;
+Texture dadoTexture;
 
 Model Kitt_M;
 Model Llanta_M;
@@ -207,58 +208,67 @@ void CrearDado()
 		4, 5, 6,
 		6, 7, 4,
 
-	};	GLfloat cubo_vertices[] = {
+	};
+
+	GLfloat cubo_vertices[] = {
 		// front
 		//x		y		z		S		T			NX		NY		NZ
-		-0.5f, -0.5f,  0.5f,	0.26f,  0.34f,		0.0f,	0.0f,	-1.0f,	//0
-		0.5f, -0.5f,  0.5f,		0.49f,	0.34f,		0.0f,	0.0f,	-1.0f,	//1
-		0.5f,  0.5f,  0.5f,		0.49f,	0.66f,		0.0f,	0.0f,	-1.0f,	//2
-		-0.5f,  0.5f,  0.5f,	0.26f,	0.66f,		0.0f,	0.0f,	-1.0f,	//3
+		-0.5f, -0.5f,  0.5f,	0.33f,  0.5f,		0.0f,	0.0f,	-1.0f,	//0
+		0.5f, -0.5f,  0.5f,		0.66f,	0.5f,		0.0f,	0.0f,	-1.0f,	//1
+		0.5f,  0.5f,  0.5f,		0.66f,	0.75f,		0.0f,	0.0f,	-1.0f,	//2
+		-0.5f,  0.5f,  0.5f,	0.33f,	0.75f,		0.0f,	0.0f,	-1.0f,	//3
 		// right
 		//x		y		z		S		T
-		0.5f, -0.5f,  0.5f,	    0.0f,  0.0f,		-1.0f,	0.0f,	0.0f,
-		0.5f, -0.5f,  -0.5f,	1.0f,	0.0f,		-1.0f,	0.0f,	0.0f,
-		0.5f,  0.5f,  -0.5f,	1.0f,	1.0f,		-1.0f,	0.0f,	0.0f,
-		0.5f,  0.5f,  0.5f,	    0.0f,	1.0f,		-1.0f,	0.0f,	0.0f,
+		0.5f, -0.5f,  0.5f,	    0.66f,  0.5f,		-1.0f,	0.0f,	0.0f,
+		0.5f, -0.5f,  -0.5f,	1.0f,	0.5f,		-1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  -0.5f,	1.0f,	0.75f,	    -1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  0.5f,	    0.66f,  0.75f,		-1.0f,	0.0f,	0.0f,
 		// back
-		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f,		0.0f,	0.0f,	1.0f,
-		0.5f, -0.5f, -0.5f,		1.0f,	0.0f,		0.0f,	0.0f,	1.0f,
-		0.5f,  0.5f, -0.5f,		1.0f,	1.0f,		0.0f,	0.0f,	1.0f,
-		-0.5f,  0.5f, -0.5f,	0.0f,	1.0f,		0.0f,	0.0f,	1.0f,
+		-0.5f, -0.5f, -0.5f,	0.66f,  0.0f,		0.0f,	0.0f,	1.0f,
+		0.5f, -0.5f, -0.5f,		0.33f,	0.0f,		0.0f,	0.0f,	1.0f,
+		0.5f,  0.5f, -0.5f,		0.33f,	0.25f,		0.0f,	0.0f,	1.0f,
+		-0.5f,  0.5f, -0.5f,	0.66f,	0.25f,		0.0f,	0.0f,	1.0f,
 
 		// left
 		//x		y		z		S		T
-		-0.5f, -0.5f,  -0.5f,	0.0f,  0.0f,		1.0f,	0.0f,	0.0f,
-		-0.5f, -0.5f,  0.5f,	1.0f,	0.0f,		1.0f,	0.0f,	0.0f,
-		-0.5f,  0.5f,  0.5f,	1.0f,	1.0f,		1.0f,	0.0f,	0.0f,
-		-0.5f,  0.5f,  -0.5f,	0.0f,	1.0f,		1.0f,	0.0f,	0.0f,
+		-0.5f, -0.5f,  -0.5f,	0.0f,  0.5f,		1.0f,	0.0f,	0.0f,
+		-0.5f, -0.5f,  0.5f,	0.33f,	0.5f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  0.5f,	0.33f,	0.75f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  -0.5f,	0.0f,	0.75f,		1.0f,	0.0f,	0.0f,
 
 		// bottom
 		//x		y		z		S		T
-		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f,		0.0f,	1.0f,	0.0f,
-		0.5f,  -0.5f,  0.5f,	1.0f,	0.0f,		0.0f,	1.0f,	0.0f,
-		 0.5f,  -0.5f,  -0.5f,	1.0f,	1.0f,		0.0f,	1.0f,	0.0f,
-		-0.5f, -0.5f,  -0.5f,	0.0f,	1.0f,		0.0f,	1.0f,	0.0f,
+		-0.5f, -0.5f,  0.5f,	0.66f,  0.25f,		0.0f,	1.0f,	0.0f,
+		0.5f,  -0.5f,  0.5f,	0.33f,  0.25f,		0.0f,	1.0f,	0.0f,
+		 0.5f,  -0.5f,  -0.5f,	0.33f,  0.5f,		0.0f,	1.0f,	0.0f,
+		-0.5f, -0.5f,  -0.5f,	0.66f,	0.5f,		0.0f,	1.0f,	0.0f,
 
 		//UP
 		 //x		y		z		S		T
-		 -0.5f, 0.5f,  0.5f,	0.0f,  0.0f,		0.0f,	-1.0f,	-1.0f,
-		 0.5f,  0.5f,  0.5f,	1.0f,	0.0f,		0.0f,	-1.0f,	-1.0f,
-		  0.5f, 0.5f,  -0.5f,	1.0f,	1.0f,		0.0f,	-1.0f,	-1.0f,
-		 -0.5f, 0.5f,  -0.5f,	0.0f,	1.0f,		0.0f,	-1.0f,	-1.0f,
+		 -0.5f, 0.5f,  0.5f,	0.33f,	0.75f,		0.0f,	-1.0f,	0.0f,
+		 0.5f,  0.5f,  0.5f,	0.66f,	0.75f,		0.0f,	-1.0f,	0.0f,
+		  0.5f, 0.5f,  -0.5f,	0.66f,	1.0f,		0.0f,	-1.0f,	0.0f,
+		 -0.5f, 0.5f,  -0.5f,	0.33f,	1.0f,		0.0f,	-1.0f,	0.0f,
 
 	};
 
 	Mesh* dado = new Mesh();
 	dado->CreateMesh(cubo_vertices, cubo_indices, 192, 36);
 	meshList.push_back(dado);
+
 }
 
 void CreateLights()
 {
+	//directional light atardecer
 	mainLight = DirectionalLight(0.6f, 0.3f, 0.5f,  
 		0.05f, 0.2f,                                
-		-1.0f, -0.2f, -0.5f);                       
+		-1.0f, -0.2f, -0.5f); 
+
+	////directional light dia
+	//mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,  
+	//	0.8f, 0.3f,                                
+	//	0.0f, -1.0f, -0.5f); 
 
 	//linterna
 	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
@@ -314,6 +324,8 @@ void LoadTextures()
 	llantaTexture.LoadTextureA();
 	lamparaTexture = Texture("Textures/Lampara.png");
 	lamparaTexture.LoadTextureA();
+	dadoTexture = Texture("Textures/DadoEmociones.png");
+	dadoTexture.LoadTextureA();
 }
 
 void LoadModels()
@@ -346,9 +358,9 @@ void SetSkybox()
 	skybox = Skybox(skyboxFaces);
 }
 
-void UpdateDeltaTime()
+void UpdateDeltaTime(GLfloat& now)
 {
-	GLfloat now = glfwGetTime();
+	now = glfwGetTime();
 	deltaTime = now - lastTime;
 	deltaTime += (now - lastTime) / limitFPS;
 	lastTime = now;
@@ -401,14 +413,42 @@ void RenderPiso(glm::mat4& model, GLuint uniformModel, GLuint uniformColor, glm:
 	meshList[2]->RenderMesh();
 }
 
-void SetLinterna()
+void SetLinterna(glm::vec3& lowerLight)
 {
-	glm::vec3 lowerLight = camera.getCameraPosition();
+	lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
 	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 }
 
-void RenderCoche(glm::mat4& model, GLuint uniformModel, glm::mat4& modelaux, GLuint uniformSpecularIntensity, GLuint uniformShininess)
+void HandleFaroCoche(glm::mat4& modelaux, glm::mat4& lightModelFaroCoche)
+{
+	lightModelFaroCoche = glm::translate(modelaux, glm::vec3(-1.05f, 0.0f, 0.0f));
+	spotLights[1].SetPos(glm::vec3(lightModelFaroCoche[3]));
+
+	switch (mainWindow.getFaroColorState())
+	{
+	case 0:
+		spotLights[1].SetColor(glm::vec3(1.0f, 0.0f, 0.0f)); // Rojo
+		break;
+	case 1:
+		spotLights[1].SetColor(glm::vec3(1.0f, 1.0f, 0.0f)); // Amarillo
+		break;
+	case 2:
+		spotLights[1].SetColor(glm::vec3(0.0f, 1.0f, 0.0f)); // Verde
+		break;
+	case 3:
+		spotLights[1].SetColor(glm::vec3(0.0f, 1.0f, 1.0f)); // Cian
+		break;
+	case 4:
+		spotLights[1].SetColor(glm::vec3(0.0f, 0.0f, 1.0f)); // Azul
+		break;
+	case 5:
+		spotLights[1].SetColor(glm::vec3(1.0f, 0.0f, 1.0f)); // Magenta
+		break;
+	}
+}
+
+void RenderCoche(glm::mat4& model, GLuint uniformModel, glm::mat4& modelaux, GLuint uniformSpecularIntensity, GLuint uniformShininess, glm::mat4& lightModelFaroCoche)
 {
 	//Chasis
 	model = glm::mat4(1.0);
@@ -425,8 +465,7 @@ void RenderCoche(glm::mat4& model, GLuint uniformModel, glm::mat4& modelaux, GLu
 	cofre.RenderModel();
 
 	// Faro 
-	glm::mat4 lightModel = glm::translate(modelaux, glm::vec3(-1.05f, 0.0f, 0.0f));
-	spotLights[1].SetPos(glm::vec3(lightModel[3]));
+	HandleFaroCoche(modelaux, lightModelFaroCoche);
 
 	//Llanta delantera izquierda
 	modelaux = model;
@@ -489,19 +528,37 @@ void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIn
 	glDisable(GL_BLEND);
 }
 
-void RenderLampara(glm::mat4& model, GLuint uniformModel)
+void RenderLampara(glm::mat4& model, GLuint uniformModel, glm::mat4& lightModelLampara)
 {
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0.0f, -0.5f, -10.0f));
 
-	glm::mat4 lightModel = glm::translate(model, glm::vec3(1.3f, 7.0f, 0.0f)); 
-	pointLights[0].SetPos(glm::vec3(lightModel[3]));
+	if (mainWindow.getLuzLampara()) 
+	{
+		lightModelLampara = glm::translate(model, glm::vec3(1.3f, 7.0f, 0.0f)); 
+		pointLights[0].SetPos(glm::vec3(lightModelLampara[3]));
+		pointLights[0].SetColor(glm::vec3(1.0f, 1.0f, 1.0f)); // Encendida
+	} 
+	else 
+	{
+		pointLights[0].SetColor(glm::vec3(0.0f, 0.0f, 0.0f)); // Apagada
+	}
 
 	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
 	model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	lamparaTexture.UseTexture();
 	lampara.RenderModel();
+}
+
+void RenderDado(glm::mat4& model, GLuint uniformModel)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	dadoTexture.UseTexture();
+	meshList[4]->RenderMesh();
 }
 
 int main()
@@ -528,20 +585,25 @@ int main()
 	SetSkybox();
 	CreateLights();
 
+	GLfloat now = 0.0f;
+	glm::vec3 lowerLight = glm::vec3(0.0f);
+	glm::mat4 lightModelFaroCoche = glm::mat4(1.0f);
+	glm::mat4 lightModelLampara = glm::mat4(1.0f);
+
 	while (!mainWindow.getShouldClose())
 	{
-		UpdateDeltaTime();
+		UpdateDeltaTime(now);
 		RegisterUserEvents();
 		ClearWindow(projection, uniformModel, uniformProjection, uniformView, uniformEyePosition, uniformColor);
 		SetShaderInfo(uniformSpecularIntensity, uniformShininess, uniformProjection, projection, uniformView, uniformEyePosition);
 
-		SetLinterna();
+		SetLinterna(lowerLight);
 		RenderPiso(model, uniformModel, uniformColor, color, uniformSpecularIntensity, uniformShininess);
-		RenderCoche(model, uniformModel, modelaux, uniformSpecularIntensity, uniformShininess);
+		RenderCoche(model, uniformModel, modelaux, uniformSpecularIntensity, uniformShininess, lightModelFaroCoche);
 		RenderHelicoptero(model, uniformModel);
-		RenderLampara(model, uniformModel);
+		RenderLampara(model, uniformModel, lightModelLampara);
+		RenderDado(model, uniformModel);
 		RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
-
 		glUseProgram(0);
 		mainWindow.swapBuffers();
 	}

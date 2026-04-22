@@ -15,6 +15,8 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	height = windowHeight;
 	muevex = 2.0f;
 	muevex2 = 0.0f; 
+	luzLampara = true;
+	faroColorState = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -118,6 +120,14 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	if (key == GLFW_KEY_O) 
 	{
 		theWindow-> muevex2 += 1.0; 
+	}
+	if (key == GLFW_KEY_L && action == GLFW_PRESS)
+	{
+		theWindow->luzLampara = !theWindow->luzLampara;
+	}
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	{
+		theWindow->faroColorState = (theWindow->faroColorState + 1) % 6;
 	}
 
 
