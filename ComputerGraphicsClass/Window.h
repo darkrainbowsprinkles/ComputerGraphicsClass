@@ -17,6 +17,8 @@ public:
 	GLfloat getmuevex2() { return muevex2; }
 	bool getLuzLampara() { return luzLampara; }
 	int getFaroColorState() { return faroColorState; }
+	bool getNaveAvanzando() { return naveAvanzando; }
+	bool getNaveRetrocediendo() { return naveRetrocediendo; }
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
@@ -37,6 +39,8 @@ private:
 	GLfloat muevex2;
 	bool luzLampara;
 	int faroColorState;
+	bool naveAvanzando;
+	bool naveRetrocediendo;
 	bool mouseFirstMoved;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);

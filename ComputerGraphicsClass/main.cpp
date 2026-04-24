@@ -48,6 +48,9 @@ Texture carroTexture;
 Texture llantaTexture;
 Texture lamparaTexture;
 Texture dadoTexture;
+Texture naveTexture;
+Texture tanqueTexture;
+Texture aguaTexture;
 
 Model Kitt_M;
 Model Llanta_M;
@@ -56,6 +59,9 @@ Model chasis;
 Model cofre;
 Model llanta;
 Model lampara;
+Model nave;
+Model tanque;
+Model agua;
 
 Skybox skybox;
 
@@ -260,15 +266,15 @@ void CrearDado()
 
 void CreateLights()
 {
-	//directional light atardecer
-	mainLight = DirectionalLight(0.6f, 0.3f, 0.5f,  
-		0.05f, 0.2f,                                
-		-1.0f, -0.2f, -0.5f); 
+	////directional light atardecer
+	//mainLight = DirectionalLight(0.6f, 0.3f, 0.5f,  
+	//	0.05f, 0.2f,                                
+	//	-1.0f, -0.2f, -0.5f); 
 
-	////directional light dia
-	//mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,  
-	//	0.8f, 0.3f,                                
-	//	0.0f, -1.0f, -0.5f); 
+	//directional light dia
+	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,  
+		0.8f, 0.3f,                                
+		0.0f, -1.0f, -0.5f); 
 
 	//linterna
 	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
@@ -279,23 +285,41 @@ void CreateLights()
 		5.0f);
 	spotLightCount++;
 
-	//faro del coche
-	spotLights[1] = SpotLight(0.0f, 0.0f, 1.0f,
+	////faro del coche
+	//spotLights[1] = SpotLight(0.0f, 0.0f, 1.0f,
+	//	1.0f, 2.0f,
+	//	0.0f, 0.0f, 0.0f,
+	//	-1.0f, -0.3f, 0.0f,
+	//	1.0f, 0.0f, 0.0f,
+	//	20.0f);
+	//spotLightCount++;
+
+	////luz de helicoptero 
+	//spotLights[2] = SpotLight(1.0f, 1.0f, 0.0f, 
+	//	1.0f, 2.0f,
+	//	0.0f, 0.0f, 0.0f, 
+	//	0.0f, -1.0f, 0.0f, 
+	//	1.0f, 0.0f, 0.0f,
+	//	15.0f);
+	//spotLightCount++;
+
+	// luz nave adelante
+	spotLights[3] = SpotLight(1.0f, 1.0f, 1.0f,
 		1.0f, 2.0f,
 		0.0f, 0.0f, 0.0f,
-		-1.0f, -0.3f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		20.0f);
-	spotLightCount++;
-
-	//luz de helicoptero 
-	spotLights[2] = SpotLight(1.0f, 1.0f, 0.0f, 
-		1.0f, 2.0f,
-		0.0f, 0.0f, 0.0f, 
-		0.0f, -1.0f, 0.0f, 
+		-1.0f, -1.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		15.0f);
-	spotLightCount++;
+
+	// luz nave atras
+	spotLights[4] = SpotLight(1.0f, 0.0f, 0.0f,
+		1.0f, 2.0f,
+		0.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		15.0f);
+
+	spotLightCount = 5;
 
 	//luz de lampara
 	pointLights[0] = PointLight(1.0f, 1.0f, 1.0f,
@@ -326,6 +350,12 @@ void LoadTextures()
 	lamparaTexture.LoadTextureA();
 	dadoTexture = Texture("Textures/DadoEmociones.png");
 	dadoTexture.LoadTextureA();
+	naveTexture = Texture("Textures/Image_0.jpeg");
+	naveTexture.LoadTextureA();
+	tanqueTexture = Texture("Textures/GlassTexture1.png");
+	tanqueTexture.LoadTextureA();
+	aguaTexture = Texture("Textures/AguaTexture.png");
+	aguaTexture.LoadTextureA();
 }
 
 void LoadModels()
@@ -344,6 +374,12 @@ void LoadModels()
 	Blackhawk_M.LoadModel("Models/uh60.obj");
 	lampara = Model();
 	lampara.LoadModel("Models/lampara.fbx");
+	nave = Model();
+	nave.LoadModel("Models/nave.obj");
+	tanque = Model();
+	tanque.LoadModel("Models/Tanque.fbx");
+	agua = Model();
+	agua.LoadModel("Models/Agua.fbx");
 }
 
 void SetSkybox()
@@ -512,6 +548,37 @@ void RenderHelicoptero(glm::mat4& model, GLuint uniformModel)
 	Blackhawk_M.RenderModel();
 }
 
+void RenderNave(glm::mat4& model, GLuint uniformModel)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(mainWindow.getmuevex2(), 5.0f, 6.0f));
+
+	if(mainWindow.getNaveAvanzando()) 
+	{
+		spotLights[3].SetPos(glm::vec3(model[3]));
+		spotLights[3].SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
+	} 
+	else 
+	{
+		spotLights[3].SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
+	}
+
+	if(mainWindow.getNaveRetrocediendo()) 
+	{
+		spotLights[4].SetPos(glm::vec3(model[3]));
+		spotLights[4].SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
+	} 
+	else 
+	{
+		spotLights[4].SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
+	}
+
+	model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	naveTexture.UseTexture();
+	nave.RenderModel();
+}
+
 void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess)
 {
 	//Agave ¿qué sucede si lo renderizan antes del coche y el helicóptero?
@@ -549,6 +616,33 @@ void RenderLampara(glm::mat4& model, GLuint uniformModel, glm::mat4& lightModelL
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	lamparaTexture.UseTexture();
 	lampara.RenderModel();
+}
+
+void RenderTanque(glm::mat4& model, GLuint uniformModel)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, -0.8f, 10.0f));
+	model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+	model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//blending: transparencia o traslucidez
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	tanqueTexture.UseTexture();
+	tanque.RenderModel();
+	glDisable(GL_BLEND);
+
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, 8.0f, 10.0f));
+	model = glm::scale(model, glm::vec3(4.9f, 4.9f, 4.9f));
+	model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//blending: transparencia o traslucidez
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	aguaTexture.UseTexture();
+	agua.RenderModel();
+	glDisable(GL_BLEND);
 }
 
 void RenderDado(glm::mat4& model, GLuint uniformModel)
@@ -599,10 +693,12 @@ int main()
 
 		SetLinterna(lowerLight);
 		RenderPiso(model, uniformModel, uniformColor, color, uniformSpecularIntensity, uniformShininess);
-		RenderCoche(model, uniformModel, modelaux, uniformSpecularIntensity, uniformShininess, lightModelFaroCoche);
-		RenderHelicoptero(model, uniformModel);
+		//RenderCoche(model, uniformModel, modelaux, uniformSpecularIntensity, uniformShininess, lightModelFaroCoche);
+		//RenderHelicoptero(model, uniformModel);
+		//RenderNave(model, uniformModel);
 		RenderLampara(model, uniformModel, lightModelLampara);
-		RenderDado(model, uniformModel);
+		//RenderDado(model, uniformModel);
+		RenderTanque(model, uniformModel);
 		RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
 		glUseProgram(0);
 		mainWindow.swapBuffers();

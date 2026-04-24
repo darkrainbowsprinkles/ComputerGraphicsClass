@@ -17,6 +17,8 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	muevex2 = 0.0f; 
 	luzLampara = true;
 	faroColorState = 0;
+	naveAvanzando = false;
+	naveRetrocediendo = false;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -39,7 +41,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	//CREAR VENTANA
-	mainWindow = glfwCreateWindow(width, height, "Practica 7: Iluminacion", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "Practica 8: Iluminacion 2", NULL, NULL);
 
 	if (!mainWindow)
 	{
@@ -96,7 +98,6 @@ GLfloat Window::getYChange()
 	return theChange;
 }
 
-
 void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode)
 {
 	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
@@ -105,32 +106,52 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
+
 	if (key == GLFW_KEY_Y)
 	{
 		theWindow-> muevex -= 1.0;
 	}
+
 	if (key == GLFW_KEY_U)
 	{
 		theWindow-> muevex += 1.0;
 	}
+
 	if (key == GLFW_KEY_I)
 	{
-		theWindow-> muevex2 -= 1.0; 
+		if (action == GLFW_PRESS || action == GLFW_REPEAT) 
+		{
+			theWindow->naveAvanzando = true;
+			theWindow->muevex2 -= 1.0;
+		} 
+		else if (action == GLFW_RELEASE) 
+		{
+			theWindow->naveAvanzando = false;
+		}
 	}
+
 	if (key == GLFW_KEY_O) 
 	{
-		theWindow-> muevex2 += 1.0; 
+		if (action == GLFW_PRESS || action == GLFW_REPEAT) 
+		{
+			theWindow->naveRetrocediendo = true;
+			theWindow->muevex2 += 1.0;
+		} 
+		else if (action == GLFW_RELEASE) 
+		{
+			theWindow->naveRetrocediendo = false;
+		}
 	}
+
 	if (key == GLFW_KEY_L && action == GLFW_PRESS)
 	{
 		theWindow->luzLampara = !theWindow->luzLampara;
 	}
+
 	if (key == GLFW_KEY_F && action == GLFW_PRESS)
 	{
 		theWindow->faroColorState = (theWindow->faroColorState + 1) % 6;
 	}
-
-
 
 	if (key >= 0 && key < 1024)
 	{
