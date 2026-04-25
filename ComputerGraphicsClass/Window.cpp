@@ -15,7 +15,14 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	height = windowHeight;
 	muevex = 2.0f;
 	muevex2 = 0.0f; 
+	pezPosX = 0.0f;
+	pezPosY = 4.0f;
+	pezPosZ = 10.0f;
+	pezSpotDirX = 0.0f;
+	pezSpotDirY = -1.0f;
+	pezSpotDirZ = 0.0f;
 	luzLampara = true;
+	luzFocoPez = true;
 	faroColorState = 0;
 	naveAvanzando = false;
 	naveRetrocediendo = false;
@@ -143,9 +150,60 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		}
 	}
 
+	if (key == GLFW_KEY_J && (action == GLFW_PRESS || action == GLFW_REPEAT)) 
+	{
+		if (theWindow->pezPosX - 0.1f >= -4.0f && theWindow->pezPosY - 0.1f >= -0.5f && theWindow->pezPosZ - 0.1f >= 6.0f)
+		{
+			theWindow->pezPosX -= 0.1f;
+			theWindow->pezPosY -= 0.1f;
+			theWindow->pezPosZ -= 0.1f;
+		}
+	}
+
+	if (key == GLFW_KEY_K && (action == GLFW_PRESS || action == GLFW_REPEAT)) 
+	{
+		if (theWindow->pezPosX + 0.1f <= 4.0f && theWindow->pezPosY + 0.1f <= 8.5f && theWindow->pezPosZ + 0.1f <= 14.0f)
+		{
+			theWindow->pezPosX += 0.1f;
+			theWindow->pezPosY += 0.1f;
+			theWindow->pezPosZ += 0.1f;
+		}
+	}
+
 	if (key == GLFW_KEY_L && action == GLFW_PRESS)
 	{
 		theWindow->luzLampara = !theWindow->luzLampara;
+	}
+
+	if (key == GLFW_KEY_H && action == GLFW_PRESS)
+	{
+		theWindow->luzFocoPez = !theWindow->luzFocoPez;
+	}
+
+	//Spotlight del Pez
+	if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT))
+	{
+		theWindow->pezSpotDirX += 0.1f;
+	}
+	if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT))
+	{
+		theWindow->pezSpotDirX -= 0.1f;
+	}
+	if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT))
+	{
+		theWindow->pezSpotDirY += 0.1f;
+	}
+	if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT))
+	{
+		theWindow->pezSpotDirY -= 0.1f;
+	}
+	if (key == GLFW_KEY_PERIOD && (action == GLFW_PRESS || action == GLFW_REPEAT)) 
+	{
+		theWindow->pezSpotDirZ += 0.1f;
+	}
+	if (key == GLFW_KEY_COMMA && (action == GLFW_PRESS || action == GLFW_REPEAT))  
+	{
+		theWindow->pezSpotDirZ -= 0.1f;
 	}
 
 	if (key == GLFW_KEY_F && action == GLFW_PRESS)

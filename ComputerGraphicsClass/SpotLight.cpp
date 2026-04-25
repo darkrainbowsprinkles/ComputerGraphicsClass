@@ -51,6 +51,11 @@ void SpotLight::SetPos(glm::vec3 pos)
 	position = pos;
 }
 
+void SpotLight::SetDirection(glm::vec3 dir)
+{
+	direction = glm::normalize(dir);
+}
+
 SpotLight::~SpotLight()
 {
 }

@@ -19,6 +19,13 @@ public:
 	int getFaroColorState() { return faroColorState; }
 	bool getNaveAvanzando() { return naveAvanzando; }
 	bool getNaveRetrocediendo() { return naveRetrocediendo; }
+	GLfloat getPezPosX() { return pezPosX; }
+	GLfloat getPezPosY() { return pezPosY; }
+	GLfloat getPezPosZ() { return pezPosZ; }
+	bool getLuzFocoPez() { return luzFocoPez; }
+	GLfloat getPezSpotDirX() { return pezSpotDirX; }
+	GLfloat getPezSpotDirY() { return pezSpotDirY; }
+	GLfloat getPezSpotDirZ() { return pezSpotDirZ; }
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
@@ -37,7 +44,14 @@ private:
 	GLfloat yChange;
 	GLfloat muevex;
 	GLfloat muevex2;
+	GLfloat pezPosX;
+	GLfloat pezPosY;
+	GLfloat pezPosZ;
+	GLfloat pezSpotDirX;
+	GLfloat pezSpotDirY;
+	GLfloat pezSpotDirZ;
 	bool luzLampara;
+	bool luzFocoPez;
 	int faroColorState;
 	bool naveAvanzando;
 	bool naveRetrocediendo;

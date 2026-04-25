@@ -51,6 +51,7 @@ Texture dadoTexture;
 Texture naveTexture;
 Texture tanqueTexture;
 Texture aguaTexture;
+Texture pezTexture;
 
 Model Kitt_M;
 Model Llanta_M;
@@ -62,6 +63,7 @@ Model lampara;
 Model nave;
 Model tanque;
 Model agua;
+Model pez;
 
 Skybox skybox;
 
@@ -266,24 +268,24 @@ void CrearDado()
 
 void CreateLights()
 {
-	////directional light atardecer
-	//mainLight = DirectionalLight(0.6f, 0.3f, 0.5f,  
-	//	0.05f, 0.2f,                                
-	//	-1.0f, -0.2f, -0.5f); 
+	//directional light atardecer
+	mainLight = DirectionalLight(0.6f, 0.3f, 0.5f,  
+		0.05f, 0.2f,                                
+		-1.0f, -0.2f, -0.5f); 
 
-	//directional light dia
-	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,  
-		0.8f, 0.3f,                                
-		0.0f, -1.0f, -0.5f); 
+	////directional light dia
+	//mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,  
+	//	0.8f, 0.3f,                                
+	//	0.0f, -1.0f, -0.5f); 
 
-	//linterna
-	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
-		0.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		5.0f);
-	spotLightCount++;
+	////linterna
+	//spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
+	//	0.0f, 2.0f,
+	//	0.0f, 0.0f, 0.0f,
+	//	0.0f, -1.0f, 0.0f,
+	//	1.0f, 0.0f, 0.0f,
+	//	5.0f);
+	//spotLightCount++;
 
 	////faro del coche
 	//spotLights[1] = SpotLight(0.0f, 0.0f, 1.0f,
@@ -303,23 +305,23 @@ void CreateLights()
 	//	15.0f);
 	//spotLightCount++;
 
-	// luz nave adelante
-	spotLights[3] = SpotLight(1.0f, 1.0f, 1.0f,
-		1.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		-1.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		15.0f);
+	//// luz nave adelante
+	//spotLights[3] = SpotLight(1.0f, 1.0f, 1.0f,
+	//	1.0f, 2.0f,
+	//	0.0f, 0.0f, 0.0f,
+	//	-1.0f, -1.0f, 0.0f,
+	//	1.0f, 0.0f, 0.0f,
+	//	15.0f);
 
-	// luz nave atras
-	spotLights[4] = SpotLight(1.0f, 0.0f, 0.0f,
-		1.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		15.0f);
+	//// luz nave atras
+	//spotLights[4] = SpotLight(1.0f, 0.0f, 0.0f,
+	//	1.0f, 2.0f,
+	//	0.0f, 0.0f, 0.0f,
+	//	1.0f, -1.0f, 0.0f,
+	//	1.0f, 0.0f, 0.0f,
+	//	15.0f);
 
-	spotLightCount = 5;
+	//spotLightCount = 5;
 
 	//luz de lampara
 	pointLights[0] = PointLight(1.0f, 1.0f, 1.0f,
@@ -327,6 +329,23 @@ void CreateLights()
 		0.0f, 0.0f, 0.0f,
 		0.3f, 0.1f, 0.05f); 
 	pointLightCount++;
+
+	//luz del pez 
+	pointLights[1] = PointLight(0.0f, 0.0f, 1.0f,
+		4.0f, 10.0f,    
+		0.0f, 0.0f, 0.0f,
+		1.0f, 0.7f, 1.8f); 
+	pointLightCount++;
+
+	//spotlight del pez (verde)
+	spotLights[0] = SpotLight(0.0f, 1.0f, 0.0f,
+		1.0f, 2.0f, 	
+		0.0f, 0.0f, 0.0f, 
+		0.0f, -1.0f, 0.0f, 
+		1.0f, 0.0f, 0.0f, 
+		15.0f); 
+
+	spotLightCount = 1;
 }
 
 
@@ -352,10 +371,12 @@ void LoadTextures()
 	dadoTexture.LoadTextureA();
 	naveTexture = Texture("Textures/Image_0.jpeg");
 	naveTexture.LoadTextureA();
-	tanqueTexture = Texture("Textures/GlassTexture1.png");
+	tanqueTexture = Texture("Textures/VidrioTexture4.png");
 	tanqueTexture.LoadTextureA();
 	aguaTexture = Texture("Textures/AguaTexture.png");
 	aguaTexture.LoadTextureA();
+	pezTexture = Texture("Textures/PezTexture.png");
+	pezTexture.LoadTextureA();
 }
 
 void LoadModels()
@@ -380,6 +401,8 @@ void LoadModels()
 	tanque.LoadModel("Models/Tanque.fbx");
 	agua = Model();
 	agua.LoadModel("Models/Agua.fbx");
+	pez = Model();
+	pez.LoadModel("Models/Pez.fbx");
 }
 
 void SetSkybox()
@@ -645,6 +668,45 @@ void RenderTanque(glm::mat4& model, GLuint uniformModel)
 	glDisable(GL_BLEND);
 }
 
+void RenderPez(glm::mat4& model, GLuint uniformModel, glm::mat4& lightModelPez)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(mainWindow.getPezPosX(), mainWindow.getPezPosY(), mainWindow.getPezPosZ()));
+
+	lightModelPez = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.6f));
+	glm::vec3 luzPos(lightModelPez[3]);
+
+	if (mainWindow.getLuzFocoPez())
+	{
+		pointLights[1].SetPos(luzPos);
+		pointLights[1].SetColor(glm::vec3(0.0f, 0.0f, 1.0f)); // Encendida
+	}
+	else
+	{
+		pointLights[1].SetColor(glm::vec3(0.0f, 0.0f, 0.0f)); // Apagada
+	}
+
+
+	spotLights[0].SetPos(luzPos);
+
+	glm::vec3 spotDir = glm::normalize(glm::vec3(
+		mainWindow.getPezSpotDirX(), 
+		mainWindow.getPezSpotDirY(), 
+		mainWindow.getPezSpotDirZ()
+	));
+
+	
+	if(glm::length(spotDir) > 0.0001f) 
+	{
+		spotLights[0].SetDirection(spotDir);
+	}
+
+	model = glm::scale(model, glm::vec3(0.07f, 0.07f, 0.07f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	pezTexture.UseTexture();
+	pez.RenderModel();
+}
+
 void RenderDado(glm::mat4& model, GLuint uniformModel)
 {
 	model = glm::mat4(1.0);
@@ -683,6 +745,7 @@ int main()
 	glm::vec3 lowerLight = glm::vec3(0.0f);
 	glm::mat4 lightModelFaroCoche = glm::mat4(1.0f);
 	glm::mat4 lightModelLampara = glm::mat4(1.0f);
+	glm::mat4 lightModelPez = glm::mat4(1.0f);
 
 	while (!mainWindow.getShouldClose())
 	{
@@ -698,6 +761,7 @@ int main()
 		//RenderNave(model, uniformModel);
 		RenderLampara(model, uniformModel, lightModelLampara);
 		//RenderDado(model, uniformModel);
+		RenderPez(model, uniformModel, lightModelPez);
 		RenderTanque(model, uniformModel);
 		RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
 		glUseProgram(0);
