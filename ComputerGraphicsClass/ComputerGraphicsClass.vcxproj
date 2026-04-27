@@ -50,11 +50,11 @@
     <ClInclude Include="definition.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="practica9_c.h" />
     <ClInclude Include="Shader_light.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Sphere.h" />
