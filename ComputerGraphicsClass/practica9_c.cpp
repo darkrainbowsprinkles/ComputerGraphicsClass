@@ -693,7 +693,6 @@ int main()
 	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
 	GLfloat now;
 
-
 	movCoche = 0.0f;
 	movOffset = 0.4f;
 	rotllanta = 0.0f;
@@ -706,7 +705,6 @@ int main()
 	SetSkybox();
 	CreateLights();
 
-	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
 		UpdateDeltaTime(now);
@@ -714,7 +712,6 @@ int main()
 		angulovaria += 0.5f*deltaTime;
 
 		//¿Cómo haces para que el carro no se salga del piso
-
 		if (movCoche > -250) // Restar 50 unidades 
 		{
 			movCoche -= movOffset * deltaTime;
