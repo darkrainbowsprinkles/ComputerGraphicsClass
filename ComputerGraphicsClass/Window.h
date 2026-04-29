@@ -19,6 +19,7 @@ public:
 	int getFaroColorState() { return faroColorState; }
 	bool getNaveAvanzando() { return naveAvanzando; }
 	bool getNaveRetrocediendo() { return naveRetrocediendo; }
+	bool getFuegoEncendido() { return fuegoEncendido; }
 	GLfloat getPezPosX() { return pezPosX; }
 	GLfloat getPezPosY() { return pezPosY; }
 	GLfloat getPezPosZ() { return pezPosZ; }
@@ -55,6 +56,7 @@ private:
 	int faroColorState;
 	bool naveAvanzando;
 	bool naveRetrocediendo;
+	bool fuegoEncendido;
 	bool mouseFirstMoved;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);

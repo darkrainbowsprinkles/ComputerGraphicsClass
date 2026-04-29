@@ -8,6 +8,7 @@ Window::Window()
 	{
 		keys[i] = 0;
 	}
+	fuegoEncendido = true;
 }
 Window::Window(GLint windowWidth, GLint windowHeight)
 {
@@ -30,6 +31,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	{
 		keys[i] = 0;
 	}
+	fuegoEncendido = true;
 }
 int Window::Initialise()
 {
@@ -148,6 +150,11 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		{
 			theWindow->naveRetrocediendo = false;
 		}
+	}
+
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	{
+		theWindow->fuegoEncendido = !theWindow->fuegoEncendido;
 	}
 
 	if (key == GLFW_KEY_J && (action == GLFW_PRESS || action == GLFW_REPEAT)) 
