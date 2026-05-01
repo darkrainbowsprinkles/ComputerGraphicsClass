@@ -50,6 +50,37 @@ float toffsetfuegov = 0.0f;
 float velocidadActualAelopile = 0.0f;
 float velocidadMaxAelopile = 1.0f;
 float aceleracionAelopile = 0.005f; 
+float timerCambio = 0.0f;
+float velocidadLanzamientoCatapulta = 100.0f; 
+
+// variables para animacion de humo
+float escalaHumo = 0.0f;
+float maxEscalaHumo = 1.5f;
+float velocidadCrecimientoHumo = 0.01f; 
+float toffsethumov = 0.0f;
+float velocidadAnimacionHumo = 0.08f;
+
+// variables para animacion de catapulta
+float rotBrazoCatapulta = 0.0f;
+bool lanzandoCatapulta = false;
+bool reiniciandoCatapulta = false;
+float velocidadReinicioCatapulta = 30.0f;
+
+// variables pelota
+bool pelotaLanzada = false;
+bool esperandoReinicio = false;
+float timerReinicio = 0.0f;
+float movPelotaX = 0.0f;
+float movPelotaY = 0.0f;
+float tiempoPelota = 0.0f;
+float velInicialPelota = 20.0f; 
+float anguloLanzamiento = 60.0f; 
+float gravedad = 9.81f;
+float velocidadPelota = 0.05f; 
+float desplazamientoXActual = 0.0f;
+int numeroRebotes = 0;
+const int maxRebotes = 3;
+float coeficienteRestitucion = 0.6f; 
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
@@ -67,6 +98,10 @@ Texture NumerosTexture;
 Texture Numero1Texture;
 Texture Numero2Texture;
 Texture fuegoTexture;
+Texture catapultaTexture;
+Texture pelotaTexture;
+Texture canastaTexture;
+Texture humoTexture;
 
 Model Kitt_M;
 Model Llanta_M;
@@ -75,6 +110,12 @@ Model Nave_M;
 Model Ala_M;
 Model Aeolipile_base_M;
 Model Aeolipile_M;
+Model catapultaBase;
+Model catapultaBrazo;
+Model catapultaCilindro;
+Model catapultaLlanta;
+Model pelota;
+Model canasta;
 
 Skybox skybox;
 
@@ -277,14 +318,22 @@ void LoadTextures()
 	Numero2Texture.LoadTextureA();
 	fuegoTexture = Texture("Textures/FuegoEditado.tga");
 	fuegoTexture.LoadTextureA();
+	catapultaTexture = Texture("Textures/catapultTEX.jpg");
+	catapultaTexture.LoadTextureA();
+	pelotaTexture = Texture("Textures/BasketballTexture.png");
+	pelotaTexture.LoadTextureA();
+	canastaTexture = Texture("Textures/BasketTexture.png");
+	canastaTexture.LoadTextureA();
+	humoTexture = Texture("Textures/HumoEditado.tga");
+	humoTexture.LoadTextureA();
 }
 
 void LoadModels()
 {
 	Kitt_M = Model();
-	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
+	//Kitt_M.LoadModel("Models/kitt_optimizado.obj");
 	Llanta_M = Model();
-	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
+	//Llanta_M.LoadModel("Models/llanta_optimizada.obj");
 	Pista_M = Model();
 	Pista_M.LoadModel("Models/pista.obj");
 	Nave_M = Model();
@@ -295,6 +344,18 @@ void LoadModels()
 	Aeolipile_base_M.LoadModel("Models/Aeolipile_base.obj");
 	Aeolipile_M = Model();
 	Aeolipile_M.LoadModel("Models/Aeolipile.obj");
+	catapultaBase = Model();
+	catapultaBase.LoadModel("Models/CatapultaBase.fbx");
+	catapultaBrazo = Model();
+	catapultaBrazo.LoadModel("Models/CatapultaBrazo.fbx");
+	catapultaCilindro = Model();
+	catapultaCilindro.LoadModel("Models/CatapultaCilindro.fbx");
+	catapultaLlanta = Model();
+	catapultaLlanta.LoadModel("Models/CatapultaLlanta.fbx");
+	pelota = Model();
+	pelota.LoadModel("Models/Basketball.fbx");
+	canasta = Model();
+	canasta.LoadModel("Models/Basket.fbx");
 }
 
 void SetSkybox()
@@ -472,6 +533,36 @@ void RenderFuego(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformText
 	meshList[3]->RenderMesh();
 }
 
+void RenderHumo(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTextureOffset, const GLuint& uniformModel, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
+{
+	if (escalaHumo <= 0.0f)
+	{
+		return;
+	}
+
+	toffsethumov -= velocidadAnimacionHumo * deltaTime; 
+
+	if (toffsethumov < -1.0f)
+	{
+		toffsethumov = 0.0f;
+	}
+
+	toffset = glm::vec2(0.0f, toffsethumov);
+
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, 5.0f, 1.5f)); 
+	model = glm::scale(model, glm::vec3(escalaHumo, escalaHumo + 1.0f, escalaHumo)); 
+
+	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	humoTexture.UseTexture();
+	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[3]->RenderMesh();
+}
+
 void RenderFlecha(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTextureOffset, const GLuint& uniformModel, glm::vec3& color, const GLuint& uniformColor, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
 {
 	//textura con movimiento
@@ -503,8 +594,6 @@ void RenderFlecha(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTex
 	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[4]->RenderMesh();
 }
-
-float timerCambio = 0.0f;
 
 void RenderNumeros(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTextureOffset, const GLuint& uniformModel, glm::vec3& color, const GLuint& uniformColor, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
 {
@@ -737,6 +826,198 @@ void UpdateVelocidadAelopile()
 	angulovaria += velocidadActualAelopile * deltaTime;
 }
 
+void UpdateHumo()
+{
+	if (velocidadActualAelopile >= velocidadMaxAelopile && mainWindow.getFuegoEncendido())
+	{
+		escalaHumo += velocidadCrecimientoHumo * deltaTime;
+
+		if (escalaHumo > maxEscalaHumo)
+		{
+			escalaHumo = maxEscalaHumo;
+		}
+	}
+	else 
+	{
+		escalaHumo -= velocidadCrecimientoHumo * deltaTime;
+
+		if (escalaHumo < 0.0f)
+		{
+			escalaHumo = 0.0f;
+		}
+	}
+}
+
+void RenderCatapulta(glm::mat4& model, glm::mat4& modelaux, GLuint uniformModel)
+{
+	catapultaTexture.UseTexture();
+
+	//base 
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(-5.8f, -1.0f, 1.5f));
+	model = glm::rotate(model, 180.0f * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
+	modelaux = model;
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	catapultaBase.RenderModel();
+
+	//brazo
+	model = modelaux;
+	model = glm::rotate(model, rotBrazoCatapulta * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	catapultaBrazo.RenderModel();
+
+	//cilindro
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(-310.0f, 40.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	catapultaCilindro.RenderModel();
+
+	//llantas
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(10.0f, -40.0f, -125.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	catapultaLlanta.RenderModel();
+
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(-340.0f, -40.0f, -125.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	catapultaLlanta.RenderModel();
+
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(10.0f, -40.0f, 125.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	catapultaLlanta.RenderModel();
+
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(-340.0f, -40.0f, 125.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	catapultaLlanta.RenderModel();
+}
+
+void RenderPelota(glm::mat4 model, GLuint uniformModel)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(-3.0f + movPelotaX, 0.2f + movPelotaY, 1.5f));
+	model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	pelotaTexture.UseTexture();
+	pelota.RenderModel();
+}
+
+void RenderCanasta(glm::mat4 model, GLuint uniformModel)
+{
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(-61.0f, -2.0f, 1.5f));
+	model = glm::rotate(model, -90.0f * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	canastaTexture.UseTexture();
+	canasta.RenderModel();
+}
+
+void CheckCatapultaTrigger()
+{
+	if (escalaHumo >= maxEscalaHumo)
+	{
+		if (rotBrazoCatapulta == 0.0f && !pelotaLanzada && !esperandoReinicio && !reiniciandoCatapulta)
+		{
+			lanzandoCatapulta = true;
+		}
+	}
+}
+
+void UpdateLanzamientoCatapulta()
+{
+	if (lanzandoCatapulta)
+	{
+		rotBrazoCatapulta -= velocidadLanzamientoCatapulta * deltaTime;
+
+		if (rotBrazoCatapulta < -75.0f) 
+		{
+			rotBrazoCatapulta = -75.0f;
+			lanzandoCatapulta = false;
+			pelotaLanzada = true; 
+			tiempoPelota = 0.0f;
+			velInicialPelota = 20.0f;
+			desplazamientoXActual = 0.0f;
+			numeroRebotes = 0;
+		}
+	}
+}
+
+void UpdateFisicasPelota()
+{
+	if (pelotaLanzada)
+	{
+		tiempoPelota += deltaTime * velocidadPelota; 
+
+		movPelotaX = desplazamientoXActual - (velInicialPelota * cos(anguloLanzamiento * toRadians) * tiempoPelota);
+		movPelotaY = (velInicialPelota * sin(anguloLanzamiento * toRadians) * tiempoPelota) - (0.5f * gravedad * (tiempoPelota * tiempoPelota));
+
+		//detener si toca el suelo
+		if (0.2f + movPelotaY <= -1.8f) 
+		{
+			if (numeroRebotes < maxRebotes)
+			{
+				desplazamientoXActual = movPelotaX; // guarda la posición X actual para continuar desde ahi
+				tiempoPelota = 0.0f; // reinicia el tiempo para la nueva parabola del rebote
+				velInicialPelota *= coeficienteRestitucion; // reduce la velocidad simulando perdida de energia
+				numeroRebotes++;
+				movPelotaY = -1.8f;
+			}
+			else
+			{
+				movPelotaY = -1.8f;
+				pelotaLanzada = false;
+				esperandoReinicio = true;
+			}
+		}
+	}
+}
+
+void UpdateCatapultaWait()
+{
+	if (esperandoReinicio)
+	{
+		timerReinicio += deltaTime;
+
+		if (timerReinicio > 2.0f) 
+		{
+			esperandoReinicio = false;
+			timerReinicio = 0.0f;
+			reiniciandoCatapulta = true; 
+			movPelotaX = 0.0f;
+			movPelotaY = 0.0f;
+			desplazamientoXActual = 0.0f;
+			numeroRebotes = 0;
+			tiempoPelota = 0.0f;
+		}
+	}
+}
+
+void UpdateCatapultaSmoothReset()
+{
+	if (reiniciandoCatapulta)
+	{
+		rotBrazoCatapulta += velocidadReinicioCatapulta * deltaTime; 
+
+		if (rotBrazoCatapulta >= 0.0f)
+		{
+			rotBrazoCatapulta = 0.0f;
+			reiniciandoCatapulta = false; 
+		}
+	}
+}
+
+void UpdateCatapulta()
+{
+	CheckCatapultaTrigger();
+	UpdateLanzamientoCatapulta();
+	UpdateFisicasPelota();
+	UpdateCatapultaWait();
+	UpdateCatapultaSmoothReset();
+}
+
 int main()
 {
 	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
@@ -772,6 +1053,8 @@ int main()
 	{
 		UpdateDeltaTime(now);
 		UpdateVelocidadAelopile();
+		UpdateHumo();
+		UpdateCatapulta();
 
 		//¿Cómo haces para que el carro no se salga del piso
 		if (movCoche > -250) // Restar 50 unidades 
@@ -785,18 +1068,20 @@ int main()
 		SetShaderInfo(uniformSpecularIntensity, uniformShininess, uniformProjection, projection, uniformView, uniformEyePosition, lowerLight);
 		ResetVariables(model, modelaux, color, toffset, uniformTextureOffset);
 		RenderPiso(model, uniformModel, uniformColor, color, uniformTextureOffset, toffset, uniformSpecularIntensity, uniformShininess);
-		//RenderPista(model, uniformModel, uniformSpecularIntensity, uniformShininess);
-		//RenderCoche(model, modelaux, uniformModel, color, uniformColor);
-		//RenderNave(model, uniformModel);
 		RenderAelopile(model, uniformModel);
-		//RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
+
 		if (mainWindow.getFuegoEncendido())
 		{
 			RenderFuego(toffset, model, uniformTextureOffset, uniformModel, uniformSpecularIntensity, uniformShininess);
 		}
+
+		RenderHumo(toffset, model, uniformTextureOffset, uniformModel, uniformSpecularIntensity, uniformShininess);
+
 		RenderFlecha(toffset, model, uniformTextureOffset, uniformModel, color, uniformColor, uniformSpecularIntensity, uniformShininess);
 		RenderNumeros(toffset, model, uniformTextureOffset, uniformModel, color, uniformColor, uniformSpecularIntensity, uniformShininess);
-
+		RenderCatapulta(model, modelaux, uniformModel);
+		RenderPelota(model, uniformModel);
+		RenderCanasta(model, uniformModel);
 		glDisable(GL_BLEND);
 		glUseProgram(0);
 		mainWindow.swapBuffers();

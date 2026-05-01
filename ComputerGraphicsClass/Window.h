@@ -14,19 +14,7 @@ public:
 	GLfloat getXChange();
 	GLfloat getYChange();
 	GLfloat getmuevex() { return muevex; }
-	GLfloat getmuevex2() { return muevex2; }
-	bool getLuzLampara() { return luzLampara; }
-	int getFaroColorState() { return faroColorState; }
-	bool getNaveAvanzando() { return naveAvanzando; }
-	bool getNaveRetrocediendo() { return naveRetrocediendo; }
 	bool getFuegoEncendido() { return fuegoEncendido; }
-	GLfloat getPezPosX() { return pezPosX; }
-	GLfloat getPezPosY() { return pezPosY; }
-	GLfloat getPezPosZ() { return pezPosZ; }
-	bool getLuzFocoPez() { return luzFocoPez; }
-	GLfloat getPezSpotDirX() { return pezSpotDirX; }
-	GLfloat getPezSpotDirY() { return pezSpotDirY; }
-	GLfloat getPezSpotDirZ() { return pezSpotDirZ; }
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
@@ -44,18 +32,6 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat muevex;
-	GLfloat muevex2;
-	GLfloat pezPosX;
-	GLfloat pezPosY;
-	GLfloat pezPosZ;
-	GLfloat pezSpotDirX;
-	GLfloat pezSpotDirY;
-	GLfloat pezSpotDirZ;
-	bool luzLampara;
-	bool luzFocoPez;
-	int faroColorState;
-	bool naveAvanzando;
-	bool naveRetrocediendo;
 	bool fuegoEncendido;
 	bool mouseFirstMoved;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
