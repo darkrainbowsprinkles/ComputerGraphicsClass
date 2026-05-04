@@ -54,7 +54,7 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="practica10 keyframes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
