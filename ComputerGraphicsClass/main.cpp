@@ -1,11 +1,7 @@
 /*
-Animación:
-- Simple o básica:Por banderas y condicionales (más de 1 transformación geométrica se ve modificada)
--Compleja: Por medio de funciones y algoritmos. 
--Textura Animada
+Animación por Keyframes
 */
 
-//para cargar imagen
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stdio.h>
@@ -31,7 +27,6 @@ Animación:
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
-#include "main.h"
 
 //variables para animación
 float movCoche;
@@ -45,42 +40,6 @@ float toffsetnumerou = 0.0f;
 float toffsetnumerov = 0.0f;
 float toffsetnumerocambiau = 0.0;
 float angulovaria = 0.0f;
-float velocidadFuego = 0.02f; 
-float toffsetfuegov = 0.0f;
-float velocidadActualAelopile = 0.0f;
-float velocidadMaxAelopile = 1.0f;
-float aceleracionAelopile = 0.005f; 
-float timerCambio = 0.0f;
-float velocidadLanzamientoCatapulta = 100.0f; 
-
-// variables para animacion de humo
-float escalaHumo = 0.0f;
-float maxEscalaHumo = 1.5f;
-float velocidadCrecimientoHumo = 0.01f; 
-float toffsethumov = 0.0f;
-float velocidadAnimacionHumo = 0.08f;
-
-// variables para animacion de catapulta
-float rotBrazoCatapulta = 0.0f;
-bool lanzandoCatapulta = false;
-bool reiniciandoCatapulta = false;
-float velocidadReinicioCatapulta = 30.0f;
-
-// variables pelota
-bool pelotaLanzada = false;
-bool esperandoReinicio = false;
-float timerReinicio = 0.0f;
-float movPelotaX = 0.0f;
-float movPelotaY = 0.0f;
-float tiempoPelota = 0.0f;
-float velInicialPelota = 20.0f; 
-float anguloLanzamiento = 60.0f; 
-float gravedad = 9.81f;
-float velocidadPelota = 0.05f; 
-float desplazamientoXActual = 0.0f;
-int numeroRebotes = 0;
-const int maxRebotes = 3;
-float coeficienteRestitucion = 0.6f; 
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
@@ -97,11 +56,6 @@ Texture FlechaTexture;
 Texture NumerosTexture;
 Texture Numero1Texture;
 Texture Numero2Texture;
-Texture fuegoTexture;
-Texture catapultaTexture;
-Texture pelotaTexture;
-Texture canastaTexture;
-Texture humoTexture;
 
 Model Kitt_M;
 Model Llanta_M;
@@ -110,12 +64,6 @@ Model Nave_M;
 Model Ala_M;
 Model Aeolipile_base_M;
 Model Aeolipile_M;
-Model catapultaBase;
-Model catapultaBrazo;
-Model catapultaCilindro;
-Model catapultaLlanta;
-Model pelota;
-Model canasta;
 
 Skybox skybox;
 
@@ -129,12 +77,36 @@ DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 
+
 static double limitFPS = 1.0 / 60.0;
+
+unsigned int spotLightCount = 0;
+unsigned int pointLightCount = 0;
+
+float reproduciranimacion, habilitaranimacion, guardoFrame, reinicioFrame, ciclo, ciclo2, contador = 0;
+const float toRadians = 3.14159265f / 180.0f;
+
 static const char* vShader = "shaders/shader_light.vert";
 static const char* fShader = "shaders/shader_light.frag";
-const float toRadians = 3.14159265f / 180.0f;
-unsigned int pointLightCount = 0;
-unsigned int spotLightCount = 0;
+
+void InputKeyframes(bool* keys);
+void UpdateDeltaTime();
+void RegisterUserEvents();
+void CreateLights();
+void SetKeyframesIniciales();
+void RenderPiso(GLuint uniformTextureOffset, glm::vec2& toffset, glm::mat4& model, GLuint uniformModel, GLuint uniformColor, glm::vec3& color, GLuint uniformSpecularIntensity, GLuint uniformShininess);
+void ClearWindow(const glm::mat4& projection, GLuint& uniformModel, GLuint& uniformProjection, GLuint& uniformView, GLuint& uniformEyePosition, GLuint& uniformColor, GLuint& uniformTextureOffset);
+void SetShaderInfo(GLuint& uniformSpecularIntensity, GLuint& uniformShininess, GLuint uniformProjection, glm::mat4& projection, GLuint uniformView, GLuint uniformEyePosition, glm::vec3& color, glm::vec2& toffset);
+void SetFlashLight(glm::vec3& lowerLight);
+void RenderCoche(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess, glm::mat4& modelaux, glm::vec3& color, GLuint uniformColor);
+void RenderNave(glm::mat4& model, glm::vec3& posblackhawk, glm::mat4& modelaux, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
+void RenderAelopile(glm::mat4& model, GLuint uniformModel);
+void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
+void RenderNumeros(glm::vec2& toffset, glm::mat4& model, GLuint uniformTextureOffset, GLuint uniformModel, glm::vec3& color, GLuint uniformColor, GLuint uniformSpecularIntensity, GLuint uniformShininess);
+void LoadTextures();
+void DisplayMenuKeyframes();
+void SetSkybox();
+void LoadModels();
 
 //cálculo del promedio de las normales para sombreado de Phong
 void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int verticeCount,
@@ -278,11 +250,11 @@ void CreateObjects()
 
 	Mesh* obj6 = new Mesh();
 	obj6->CreateMesh(scoreVertices, scoreIndices, 32, 6);
-	meshList.push_back(obj6); // todos los números
+	meshList.push_back(obj6);
 
 	Mesh* obj7 = new Mesh();
 	obj7->CreateMesh(numeroVertices, numeroIndices, 32, 6);
-	meshList.push_back(obj7); // solo un número
+	meshList.push_back(obj7);
 
 }
 
@@ -295,7 +267,139 @@ void CreateShaders()
 }
 
 
-// Carro debe detenerse en -300x y 300x (el piso escalado mide 600)
+
+///////////////////////////////KEYFRAMES/////////////////////
+
+bool animacion = false;
+
+//NEW// Keyframes
+float posXavion = 2.0, posYavion = 2.0, posZavion = 0;
+float movAvion_x = 0.0f, movAvion_y = 0.0f;
+float giroAvion = 0;
+float btn_Xpos = 0, btn_Xneg = 0;
+float btn_Ypos = 0, btn_Yneg = 0;
+float btn_RotPos = 0, btn_RotNeg = 0;
+float btn_HabilitarMov = 0;
+
+#define MAX_FRAMES 100
+int i_max_steps = 600;
+int i_curr_steps = 6;
+typedef struct _frame
+{
+	//Variables para GUARDAR Key Frames
+	float movAvion_x;		//Variable para PosicionX
+	float movAvion_y;		//Variable para PosicionY
+	float movAvion_xInc;		//Variable para IncrementoX
+	float movAvion_yInc;		//Variable para IncrementoY
+	float giroAvion;
+	float giroAvionInc;
+}FRAME;
+
+FRAME KeyFrame[MAX_FRAMES];
+int FrameIndex = 6;			//introducir datos
+bool play = false;
+int playIndex = 0;
+
+void saveFrame(void) //tecla L
+{
+
+	printf("frameindex %d\n", FrameIndex);
+
+
+	KeyFrame[FrameIndex].movAvion_x = movAvion_x;
+	KeyFrame[FrameIndex].movAvion_y = movAvion_y;
+	KeyFrame[FrameIndex].giroAvion = giroAvion;
+	//no volatil, agregar una forma de escribir a un archivo para guardar los frames
+	FrameIndex++;
+}
+
+void resetElements(void) //Tecla 0
+{
+
+	movAvion_x = KeyFrame[0].movAvion_x;
+	movAvion_y = KeyFrame[0].movAvion_y;
+	giroAvion = KeyFrame[0].giroAvion;
+}
+
+void interpolation(void)
+{
+	KeyFrame[playIndex].movAvion_xInc = (KeyFrame[playIndex + 1].movAvion_x - KeyFrame[playIndex].movAvion_x) / i_max_steps;
+	KeyFrame[playIndex].movAvion_yInc = (KeyFrame[playIndex + 1].movAvion_y - KeyFrame[playIndex].movAvion_y) / i_max_steps;
+	KeyFrame[playIndex].giroAvionInc = (KeyFrame[playIndex + 1].giroAvion - KeyFrame[playIndex].giroAvion) / i_max_steps;
+
+}
+
+
+void animate(void)
+{
+	//Movimiento del objeto // barra espaciadora
+	if (play)
+	{
+		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		{
+			playIndex++;
+			printf("playindex : %d\n", playIndex);
+			if (playIndex > FrameIndex - 2)	//end of total animation?
+			{
+				printf("Frame index= %d\n", FrameIndex);
+				printf("termina anim\n");
+				playIndex = 0;
+				play = false;
+			}
+			else //Next frame interpolations
+			{
+				//printf("entro aquí\n");
+				i_curr_steps = 0; //Reset counter
+				//Interpolation
+				interpolation();
+			}
+		}
+		else
+		{
+			//printf("se quedó aqui\n");
+			//printf("max steps: %f", i_max_steps);
+			//Draw animation
+			movAvion_x += KeyFrame[playIndex].movAvion_xInc;
+			movAvion_y += KeyFrame[playIndex].movAvion_yInc;
+			giroAvion += KeyFrame[playIndex].giroAvionInc;
+			i_curr_steps++;
+		}
+
+	}
+}
+
+///////////////* FIN KEYFRAMES*////////////////////////////
+
+void SetSkybox()
+{
+	std::vector<std::string> skyboxFaces;
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_dn.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
+	skybox = Skybox(skyboxFaces);
+}
+
+void LoadModels()
+{
+	Kitt_M = Model();
+	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
+	Llanta_M = Model();
+	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
+	Pista_M = Model();
+	Pista_M.LoadModel("Models/pista.obj");
+	Nave_M = Model();
+	Nave_M.LoadModel("Models/nave.obj");
+	Ala_M = Model();
+	Ala_M.LoadModel("Models/ala.obj");
+	Aeolipile_base_M = Model();
+	Aeolipile_base_M.LoadModel("Models/Aeolipile_base.obj");
+	Aeolipile_M = Model();
+	Aeolipile_M.LoadModel("Models/Aeolipile.obj");
+}
+
 void LoadTextures()
 {
 	brickTexture = Texture("Textures/brick.png");
@@ -316,66 +420,33 @@ void LoadTextures()
 	Numero1Texture.LoadTextureA();
 	Numero2Texture = Texture("Textures/numero2.tga");
 	Numero2Texture.LoadTextureA();
-	fuegoTexture = Texture("Textures/FuegoEditado.tga");
-	fuegoTexture.LoadTextureA();
-	catapultaTexture = Texture("Textures/catapultTEX.jpg");
-	catapultaTexture.LoadTextureA();
-	pelotaTexture = Texture("Textures/BasketballTexture.png");
-	pelotaTexture.LoadTextureA();
-	canastaTexture = Texture("Textures/BasketTexture.png");
-	canastaTexture.LoadTextureA();
-	humoTexture = Texture("Textures/HumoEditado.tga");
-	humoTexture.LoadTextureA();
 }
 
-void LoadModels()
+void DisplayMenuKeyframes()
 {
-	Kitt_M = Model();
-	//Kitt_M.LoadModel("Models/kitt_optimizado.obj");
-	Llanta_M = Model();
-	//Llanta_M.LoadModel("Models/llanta_optimizada.obj");
-	Pista_M = Model();
-	Pista_M.LoadModel("Models/pista.obj");
-	Nave_M = Model();
-	Nave_M.LoadModel("Models/nave.obj");
-	Ala_M = Model();
-	Ala_M.LoadModel("Models/ala.obj");
-	Aeolipile_base_M = Model();
-	Aeolipile_base_M.LoadModel("Models/Aeolipile_base.obj");
-	Aeolipile_M = Model();
-	Aeolipile_M.LoadModel("Models/Aeolipile.obj");
-	catapultaBase = Model();
-	catapultaBase.LoadModel("Models/CatapultaBase.fbx");
-	catapultaBrazo = Model();
-	catapultaBrazo.LoadModel("Models/CatapultaBrazo.fbx");
-	catapultaCilindro = Model();
-	catapultaCilindro.LoadModel("Models/CatapultaCilindro.fbx");
-	catapultaLlanta = Model();
-	catapultaLlanta.LoadModel("Models/CatapultaLlanta.fbx");
-	pelota = Model();
-	pelota.LoadModel("Models/Basketball.fbx");
-	canasta = Model();
-	canasta.LoadModel("Models/Basket.fbx");
-}
+	printf("\n--- CONTROLES DE ANIMACION POR KEYFRAMES ---\n");
+	printf("REPRODUCCION:\n");
+	printf(" [Barra Espaciadora] Reproducir animacion guardada.\n");
+	printf(" [0] Habilitar reproduccion de nuevo.\n\n");
 
-void SetSkybox()
-{
-	std::vector<std::string> skyboxFaces;
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_dn.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
-	skybox = Skybox(skyboxFaces);
+	printf("GUARDADO DE FRAMES:\n");
+	printf(" [L] Guardar el Keyframe actual.\n");
+	printf(" [P] Habilitar para poder guardar el siguiente Keyframe.\n\n");
+
+	printf("MOVIMIENTO MANUAL:\n");
+	printf(" [Flechas Izq/Der] Mover nave en el eje X.\n");
+	printf(" [Flechas Arr/Aba] Mover nave en el eje Y.\n");
+	printf(" [Q / E] Girar la nave hacia la izquierda/derecha.\n");
+	printf(" [2] Habilitar movimiento.\n");
+	printf("--------------------------------------------\n\n");
 }
 
 void CreateLights()
 {
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.5f, 0.5f,
-		0.0f, -1.0f, -1.0f);
+		0.3f, 0.3f,
+		0.0f, 0.0f, -1.0f);
 	//contador de luces puntuales
 
 	//Declaración de primer luz puntual
@@ -384,7 +455,6 @@ void CreateLights()
 		0.0f, 2.5f, 1.5f,
 		0.3f, 0.2f, 0.1f);
 	pointLightCount++;
-
 
 	//linterna
 	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
@@ -405,8 +475,101 @@ void CreateLights()
 	spotLightCount++;
 }
 
-void RenderCoche(glm::mat4& model, glm::mat4& modelaux, const GLuint& uniformModel, glm::vec3& color, const GLuint& uniformColor)
+void SetKeyframesIniciales()
 {
+	KeyFrame[0].movAvion_x = 0.0f;
+	KeyFrame[0].movAvion_y = 0.0f;
+	KeyFrame[0].giroAvion = 0;
+
+
+	KeyFrame[1].movAvion_x = 1.0f;
+	KeyFrame[1].movAvion_y = 2.0f;
+	KeyFrame[1].giroAvion = 0;
+
+
+	KeyFrame[2].movAvion_x = 2.0f;
+	KeyFrame[2].movAvion_y = 0.0f;
+	KeyFrame[2].giroAvion = 0;
+
+
+	KeyFrame[3].movAvion_x = 3.0f;
+	KeyFrame[3].movAvion_y = -2.0f;
+	KeyFrame[3].giroAvion = 0;
+
+
+	KeyFrame[4].movAvion_x = 3.0f;
+	KeyFrame[4].movAvion_y = -2.0f;
+	KeyFrame[4].giroAvion = 180.0f;
+
+	KeyFrame[5].movAvion_x = 0.0f;
+	KeyFrame[5].movAvion_y = 0.0f;
+	KeyFrame[5].giroAvion = 180.0f;
+}
+
+void RenderPiso(GLuint uniformTextureOffset, glm::vec2& toffset, glm::mat4& model, GLuint uniformModel, GLuint uniformColor, glm::vec3& color, GLuint uniformSpecularIntensity, GLuint uniformShininess)
+{
+	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+	pisoTexture.UseTexture();
+	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[2]->RenderMesh();
+}
+
+void ClearWindow(const glm::mat4& projection, GLuint& uniformModel, GLuint& uniformProjection, GLuint& uniformView, GLuint& uniformEyePosition, GLuint& uniformColor, GLuint& uniformTextureOffset)
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+	shaderList[0].UseShader();
+	uniformModel = shaderList[0].GetModelLocation();
+	uniformProjection = shaderList[0].GetProjectionLocation();
+	uniformView = shaderList[0].GetViewLocation();
+	uniformEyePosition = shaderList[0].GetEyePositionLocation();
+	uniformColor = shaderList[0].getColorLocation();
+	uniformTextureOffset = shaderList[0].getOffsetLocation();
+}
+
+void SetShaderInfo(GLuint& uniformSpecularIntensity, GLuint& uniformShininess, GLuint uniformProjection, glm::mat4& projection, GLuint uniformView, GLuint uniformEyePosition, glm::vec3& color, glm::vec2& toffset)
+{
+	//información en el shader de intensidad especular y brillo
+	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
+	uniformShininess = shaderList[0].GetShininessLocation();
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
+	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+
+	//información al shader de fuentes de iluminación
+	shaderList[0].SetDirectionalLight(&mainLight);
+	shaderList[0].SetPointLights(pointLights, pointLightCount);
+	shaderList[0].SetSpotLights(spotLights, spotLightCount);
+
+	//reiniciar variables antes de que sean enviadas al shader
+	color = glm::vec3(1.0f, 1.0f, 1.0f);
+	toffset = glm::vec2(0.0f, 0.0f);
+}
+
+void SetFlashLight(glm::vec3& lowerLight)
+{
+	lowerLight = camera.getCameraPosition();
+	lowerLight.y -= 0.3f;
+	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+}
+
+void RenderCoche(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess, glm::mat4& modelaux, glm::vec3& color, GLuint uniformColor)
+{
+	//Pista
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0.0f, -2.1f, 2.0f));
+	model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//Pista_M.RenderModel();
+
 	//Instancia del coche 
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(movCoche - 50.0f, 0.5f, -2.0f));
@@ -455,44 +618,36 @@ void RenderCoche(glm::mat4& model, glm::mat4& modelaux, const GLuint& uniformMod
 	Llanta_M.RenderModel();
 }
 
-void RenderPista(glm::mat4& model, const GLuint& uniformModel, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
+void RenderNave(glm::mat4& model, glm::vec3& posblackhawk, glm::mat4& modelaux, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess)
 {
-	//Pista
 	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, -2.1f, 2.0f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+	posblackhawk = glm::vec3(posXavion + movAvion_x, posYavion + movAvion_y, posZavion);
+	model = glm::translate(model, posblackhawk);
+	modelaux = model;
+	model = glm::rotate(model, (180 + giroAvion) * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	Pista_M.RenderModel();
-}
-
-void RenderNave(glm::mat4& model, const GLuint& uniformModel)
-{
-	//Aquí va la nave con jerarquía de modelos, completar
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(movCoche, sin(rotllanta * toRadians * 0.5f) + 3.0f, 1.5f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	Nave_M.RenderModel();
 
+	model = modelaux;
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	Ala_M.RenderModel();
 }
 
-void RenderAelopile(glm::mat4& model, const GLuint& uniformModel)
+void RenderAelopile(glm::mat4& model, GLuint uniformModel)
 {
 	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 1.5f));
+	model = glm::translate(model, glm::vec3(10.0f, -0.5f, 3.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	Aeolipile_base_M.RenderModel();
 
-	model = glm::translate(model, glm::vec3(0.0f, 5.0f, -0.1f));
-	model = glm::rotate(model, angulovaria * 15.0f * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	Aeolipile_M.RenderModel();
 }
 
-void RenderAgave(glm::mat4& model, const GLuint& uniformModel, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
+void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess)
 {
 	//Agave ¿qué sucede si lo renderizan antes del coche y de la pista?
 	model = glm::mat4(1.0);
@@ -507,63 +662,7 @@ void RenderAgave(glm::mat4& model, const GLuint& uniformModel, const GLuint& uni
 	meshList[3]->RenderMesh();
 }
 
-void RenderFuego(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTextureOffset, const GLuint& uniformModel, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
-{
-	toffsetfuegov -= velocidadFuego * deltaTime; 
-
-	if (toffsetfuegov < -1.0f)
-	{
-		toffsetfuegov = 0.0f;
-	}
-
-	toffset = glm::vec2(0.0f, toffsetfuegov);
-
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, -0.7f, 1.5f));
-	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f)); 
-
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-	//blending: transparencia o traslucidez
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	fuegoTexture.UseTexture();
-	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[3]->RenderMesh();
-}
-
-void RenderHumo(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTextureOffset, const GLuint& uniformModel, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
-{
-	if (escalaHumo <= 0.0f)
-	{
-		return;
-	}
-
-	toffsethumov -= velocidadAnimacionHumo * deltaTime; 
-
-	if (toffsethumov < -1.0f)
-	{
-		toffsethumov = 0.0f;
-	}
-
-	toffset = glm::vec2(0.0f, toffsethumov);
-
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, 5.0f, 1.5f)); 
-	model = glm::scale(model, glm::vec3(escalaHumo, escalaHumo + 1.0f, escalaHumo)); 
-
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	humoTexture.UseTexture();
-	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[3]->RenderMesh();
-}
-
-void RenderFlecha(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTextureOffset, const GLuint& uniformModel, glm::vec3& color, const GLuint& uniformColor, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
+void RenderNumeros(glm::vec2& toffset, glm::mat4& model, GLuint uniformTextureOffset, GLuint uniformModel, glm::vec3& color, GLuint uniformColor, GLuint uniformSpecularIntensity, GLuint uniformShininess)
 {
 	//textura con movimiento
 	//Importantes porque la variable uniform no podemos modificarla directamente
@@ -574,7 +673,6 @@ void RenderFlecha(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTex
 		toffsetflechau = 0.0;
 	//if (toffsetv > 1.0)
 	//	toffsetv = 0;
-	//printf("\ntfosset %f \n", toffsetu);
 	//pasar a la variable uniform el valor actualizado
 	toffset = glm::vec2(toffsetflechau, toffsetflechav);
 
@@ -586,19 +684,9 @@ void RenderFlecha(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTex
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	color = glm::vec3(1.0f, 0.0f, 0.0f);
 	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	FlechaTexture.UseTexture();
 	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[4]->RenderMesh();
-}
-
-void RenderNumeros(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTextureOffset, const GLuint& uniformModel, glm::vec3& color, const GLuint& uniformColor, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
-{
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//plano con todos los números
 	toffsetnumerou = 0.0;
@@ -617,13 +705,10 @@ void RenderNumeros(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTe
 	meshList[5]->RenderMesh();
 
 	//número 1
-	//toffsetnumerou = 0.0;
-	//toffsetnumerov = 0.0;
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(-10.0f, 2.0f, -6.0f));
 	model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-	//glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	color = glm::vec3(1.0f, 1.0f, 1.0f);
 	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
@@ -631,7 +716,7 @@ void RenderNumeros(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTe
 	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[6]->RenderMesh();
 
-	for (int i = 1; i < 4; i++)
+	for (int i = 1; i<4; i++)
 	{
 		//números 2-4
 		toffsetnumerou += 0.25;
@@ -675,20 +760,9 @@ void RenderNumeros(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTe
 	/*
 	¿Cómo hacer para que sea a una velocidad visible?
 	*/
-	timerCambio += deltaTime;
-
-	if (timerCambio > 30.0f) 
-	{
-		toffsetnumerocambiau += 0.25f;
-
-		if (toffsetnumerocambiau > 1.0f)
-		{
-			toffsetnumerocambiau = 0.0f;
-		}
-
-		timerCambio = 0.0f;
-	}
-
+	toffsetnumerocambiau += 0.25;
+	if (toffsetnumerocambiau > 1.0)
+		toffsetnumerocambiau = 0.0;
 	toffsetnumerov = 0.0;
 	toffset = glm::vec2(toffsetnumerocambiau, toffsetnumerov);
 	model = glm::mat4(1.0);
@@ -716,60 +790,12 @@ void RenderNumeros(glm::vec2& toffset, glm::mat4& model, const GLuint& uniformTe
 	color = glm::vec3(1.0f, 1.0f, 1.0f);
 	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 	Numero1Texture.UseTexture();
-	//if 
+	//if
 	//Numero1Texture.UseTexture();
 	//Numero2Texture.UseTexture();
 
 	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[5]->RenderMesh();
-}
-
-void RenderPiso(glm::mat4& model, const GLuint& uniformModel, const GLuint& uniformColor, glm::vec3& color, const GLuint& uniformTextureOffset, glm::vec2& toffset, const GLuint& uniformSpecularIntensity, const GLuint& uniformShininess)
-{
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-	pisoTexture.UseTexture();
-	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[2]->RenderMesh();
-}
-
-void SetShaderInfo(GLuint& uniformSpecularIntensity, GLuint& uniformShininess, const GLuint& uniformProjection, glm::mat4& projection, const GLuint& uniformView, const GLuint& uniformEyePosition, glm::vec3& lowerLight)
-{
-	//información en el shader de intensidad especular y brillo
-	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
-	uniformShininess = shaderList[0].GetShininessLocation();
-
-	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-
-	// luz ligada a la cámara de tipo flash
-	lowerLight = camera.getCameraPosition();
-	lowerLight.y -= 0.3f;
-	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-
-	//información al shader de fuentes de iluminación
-	shaderList[0].SetDirectionalLight(&mainLight);
-	shaderList[0].SetPointLights(pointLights, pointLightCount);
-	shaderList[0].SetSpotLights(spotLights, spotLightCount);
-}
-
-void ClearWindow(const glm::mat4& projection, GLuint& uniformModel, GLuint& uniformProjection, GLuint& uniformView, GLuint& uniformEyePosition, GLuint& uniformColor, GLuint& uniformTextureOffset)
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
-	shaderList[0].UseShader();
-	uniformModel = shaderList[0].GetModelLocation();
-	uniformProjection = shaderList[0].GetProjectionLocation();
-	uniformView = shaderList[0].GetViewLocation();
-	uniformEyePosition = shaderList[0].GetEyePositionLocation();
-	uniformColor = shaderList[0].getColorLocation();
-	uniformTextureOffset = shaderList[0].getOffsetLocation(); // para la textura con movimiento
 }
 
 void RegisterUserEvents()
@@ -779,309 +805,212 @@ void RegisterUserEvents()
 	camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 }
 
-void ResetVariables(glm::mat4& model, glm::mat4& modelaux, glm::vec3& color, glm::vec2& toffset, const GLuint& uniformTextureOffset)
+void UpdateDeltaTime()
 {
-	model = glm::mat4(1.0);
-	modelaux = glm::mat4(1.0);
-	color = glm::vec3(1.0f, 1.0f, 1.0f);
-	toffset = glm::vec2(0.0f, 0.0f);
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-}
-
-void UpdateDeltaTime(GLfloat& now)
-{
-	now = glfwGetTime();
+	GLfloat now = glfwGetTime();
 	deltaTime = now - lastTime;
 	deltaTime += (now - lastTime) / limitFPS;
 	lastTime = now;
 }
 
-void UpdateVelocidadAelopile()
+void InputKeyframes(bool* keys)
 {
-	if (mainWindow.getFuegoEncendido())
+	if (keys[GLFW_KEY_SPACE])
 	{
-		if (velocidadActualAelopile < velocidadMaxAelopile)
+		if (reproduciranimacion < 1)
 		{
-			velocidadActualAelopile += aceleracionAelopile * deltaTime;
-
-			if (velocidadActualAelopile > velocidadMaxAelopile)
+			if (play == false && (FrameIndex > 1))
 			{
-				velocidadActualAelopile = velocidadMaxAelopile;
-			}
-		}
-	}
-	else
-	{
-		if (velocidadActualAelopile > 0.0f)
-		{
-			velocidadActualAelopile -= aceleracionAelopile * deltaTime;
+				resetElements();
+				//First Interpolation				
+				interpolation();
+				play = true;
+				playIndex = 0;
+				i_curr_steps = 0;
+				reproduciranimacion++;
+				printf("presiona 0 para habilitar reproducir de nuevo la animación'\n");
+				habilitaranimacion = 0;
 
-			if (velocidadActualAelopile < 0.0f)
-			{
-				velocidadActualAelopile = 0.0f;
-			}
-		}
-	}
-
-	angulovaria += velocidadActualAelopile * deltaTime;
-}
-
-void UpdateHumo()
-{
-	if (velocidadActualAelopile >= velocidadMaxAelopile && mainWindow.getFuegoEncendido())
-	{
-		escalaHumo += velocidadCrecimientoHumo * deltaTime;
-
-		if (escalaHumo > maxEscalaHumo)
-		{
-			escalaHumo = maxEscalaHumo;
-		}
-	}
-	else 
-	{
-		escalaHumo -= velocidadCrecimientoHumo * deltaTime;
-
-		if (escalaHumo < 0.0f)
-		{
-			escalaHumo = 0.0f;
-		}
-	}
-}
-
-void RenderCatapulta(glm::mat4& model, glm::mat4& modelaux, GLuint uniformModel)
-{
-	catapultaTexture.UseTexture();
-
-	//base 
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-5.8f, -1.0f, 1.5f));
-	model = glm::rotate(model, 180.0f * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
-	modelaux = model;
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	catapultaBase.RenderModel();
-
-	//brazo
-	model = modelaux;
-	model = glm::rotate(model, rotBrazoCatapulta * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	catapultaBrazo.RenderModel();
-
-	//cilindro
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(-310.0f, 40.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	catapultaCilindro.RenderModel();
-
-	//llantas
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(10.0f, -40.0f, -125.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	catapultaLlanta.RenderModel();
-
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(-340.0f, -40.0f, -125.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	catapultaLlanta.RenderModel();
-
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(10.0f, -40.0f, 125.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	catapultaLlanta.RenderModel();
-
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(-340.0f, -40.0f, 125.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	catapultaLlanta.RenderModel();
-}
-
-void RenderPelota(glm::mat4 model, GLuint uniformModel)
-{
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-3.0f + movPelotaX, 0.2f + movPelotaY, 1.5f));
-	model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	pelotaTexture.UseTexture();
-	pelota.RenderModel();
-}
-
-void RenderCanasta(glm::mat4 model, GLuint uniformModel)
-{
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-61.0f, -2.0f, 1.5f));
-	model = glm::rotate(model, -90.0f * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	canastaTexture.UseTexture();
-	canasta.RenderModel();
-}
-
-void CheckCatapultaTrigger()
-{
-	if (escalaHumo >= maxEscalaHumo)
-	{
-		if (rotBrazoCatapulta == 0.0f && !pelotaLanzada && !esperandoReinicio && !reiniciandoCatapulta)
-		{
-			lanzandoCatapulta = true;
-		}
-	}
-}
-
-void UpdateLanzamientoCatapulta()
-{
-	if (lanzandoCatapulta)
-	{
-		rotBrazoCatapulta -= velocidadLanzamientoCatapulta * deltaTime;
-
-		if (rotBrazoCatapulta < -75.0f) 
-		{
-			rotBrazoCatapulta = -75.0f;
-			lanzandoCatapulta = false;
-			pelotaLanzada = true; 
-			tiempoPelota = 0.0f;
-			velInicialPelota = 20.0f;
-			desplazamientoXActual = 0.0f;
-			numeroRebotes = 0;
-		}
-	}
-}
-
-void UpdateFisicasPelota()
-{
-	if (pelotaLanzada)
-	{
-		tiempoPelota += deltaTime * velocidadPelota; 
-
-		movPelotaX = desplazamientoXActual - (velInicialPelota * cos(anguloLanzamiento * toRadians) * tiempoPelota);
-		movPelotaY = (velInicialPelota * sin(anguloLanzamiento * toRadians) * tiempoPelota) - (0.5f * gravedad * (tiempoPelota * tiempoPelota));
-
-		//detener si toca el suelo
-		if (0.2f + movPelotaY <= -1.8f) 
-		{
-			if (numeroRebotes < maxRebotes)
-			{
-				desplazamientoXActual = movPelotaX; // guarda la posición X actual para continuar desde ahi
-				tiempoPelota = 0.0f; // reinicia el tiempo para la nueva parabola del rebote
-				velInicialPelota *= coeficienteRestitucion; // reduce la velocidad simulando perdida de energia
-				numeroRebotes++;
-				movPelotaY = -1.8f;
 			}
 			else
 			{
-				movPelotaY = -1.8f;
-				pelotaLanzada = false;
-				esperandoReinicio = true;
+				play = false;
+
 			}
 		}
 	}
-}
 
-void UpdateCatapultaWait()
-{
-	if (esperandoReinicio)
+	if (keys[GLFW_KEY_0])
 	{
-		timerReinicio += deltaTime;
-
-		if (timerReinicio > 2.0f) 
+		if (habilitaranimacion < 1)
 		{
-			esperandoReinicio = false;
-			timerReinicio = 0.0f;
-			reiniciandoCatapulta = true; 
-			movPelotaX = 0.0f;
-			movPelotaY = 0.0f;
-			desplazamientoXActual = 0.0f;
-			numeroRebotes = 0;
-			tiempoPelota = 0.0f;
+			reproduciranimacion = 0;
+			habilitaranimacion = 1;
+			printf("Ya puedes reproducir de nuevo la animacion con la tecla de barra espaciadora'\n");
 		}
 	}
-}
 
-void UpdateCatapultaSmoothReset()
-{
-	if (reiniciandoCatapulta)
+	if (keys[GLFW_KEY_L])
 	{
-		rotBrazoCatapulta += velocidadReinicioCatapulta * deltaTime; 
-
-		if (rotBrazoCatapulta >= 0.0f)
+		if (guardoFrame < 1)
 		{
-			rotBrazoCatapulta = 0.0f;
-			reiniciandoCatapulta = false; 
+			saveFrame();
+			//printf("movAvion_x es: %f\n", movAvion_x);
+			//printf("movAvion_y es: %f\n", movAvion_y);
+			printf("presiona P para habilitar guardar otro frame'\n");
+			guardoFrame++;
+			reinicioFrame = 0;
 		}
 	}
-}
 
-void UpdateCatapulta()
-{
-	CheckCatapultaTrigger();
-	UpdateLanzamientoCatapulta();
-	UpdateFisicasPelota();
-	UpdateCatapultaWait();
-	UpdateCatapultaSmoothReset();
+	if (keys[GLFW_KEY_P])
+	{
+		if (reinicioFrame < 1)
+		{
+			guardoFrame = 0;
+			printf("Ya puedes guardar otro frame presionando la tecla L'\n");
+		}
+	}
+
+	// CONTROLES DE POSICION
+	if (keys[GLFW_KEY_RIGHT]) 
+	{
+		if (btn_Xpos < 1) {
+			movAvion_x += 1.0f;
+			printf("X: %f, Y: %f, Giro: %f\n", movAvion_x, movAvion_y, giroAvion);
+			btn_Xpos++; btn_HabilitarMov = 0;
+		}
+	}
+
+	if (keys[GLFW_KEY_LEFT]) 
+	{
+		if (btn_Xneg < 1) 
+		{
+			movAvion_x -= 1.0f;
+			printf("X: %f, Y: %f, Giro: %f\n", movAvion_x, movAvion_y, giroAvion);
+			btn_Xneg++; btn_HabilitarMov = 0;
+		}
+	}
+
+	if (keys[GLFW_KEY_UP]) 
+	{
+		if (btn_Ypos < 1) 
+		{
+			movAvion_y += 1.0f;
+			printf("X: %f, Y: %f, Giro: %f\n", movAvion_x, movAvion_y, giroAvion);
+			btn_Ypos++; btn_HabilitarMov = 0;
+		}
+	}
+
+	if (keys[GLFW_KEY_DOWN]) 
+	{
+		if (btn_Yneg < 1) 
+		{
+			movAvion_y -= 1.0f;
+			printf("X: %f, Y: %f, Giro: %f\n", movAvion_x, movAvion_y, giroAvion);
+			btn_Yneg++; btn_HabilitarMov = 0;
+		}
+	}
+
+	// CONTROLES DE ROTACION
+	if (keys[GLFW_KEY_E]) // Girar a la derecha
+	{ 
+		if (btn_RotPos < 1) {
+			giroAvion -= 45.0f;
+			printf("X: %f, Y: %f, Giro: %f\n", movAvion_x, movAvion_y, giroAvion);
+			btn_RotPos++; btn_HabilitarMov = 0;
+		}
+	}
+
+	if (keys[GLFW_KEY_Q]) // Girar a la izquierda
+	{ 
+		if (btn_RotNeg < 1) {
+			giroAvion += 45.0f;
+			printf("X: %f, Y: %f, Giro: %f\n", movAvion_x, movAvion_y, giroAvion);
+			btn_RotNeg++; btn_HabilitarMov = 0;
+		}
+	}
+
+	// RESET DE BOTONES
+	if (keys[GLFW_KEY_2]) 
+	{
+		if (btn_HabilitarMov < 1) 
+		{
+			btn_Xpos = 0; btn_Xneg = 0;
+			btn_Ypos = 0; btn_Yneg = 0;
+			btn_RotPos = 0; btn_RotNeg = 0;
+			btn_HabilitarMov++;
+			printf("Movimientos habilitados de nuevo (Presiona flechas o Q/E)\n");
+		}
+	}
 }
 
 int main()
 {
 	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
 	mainWindow.Initialise();
+
+	CreateObjects();
+	CreateShaders();
+
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.5f, 0.5f);
+
+	LoadTextures();
+	LoadModels();
+	SetSkybox();
 
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
-	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0, uniformSpecularIntensity = 0, uniformShininess = 0, uniformTextureOffset = 0;
+	CreateLights();
+
+	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0, uniformSpecularIntensity = 0, uniformShininess = 0, uniformTextureOffset=0;
 	GLuint uniformColor = 0;
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
-	glm::vec3 lowerLight(0.0f, 0.0f, 0.0f);
-	glm::mat4 model(1.0);
-	glm::mat4 modelaux(1.0);
-	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
-	GLfloat now;
-
+	
 	movCoche = 0.0f;
-	movOffset = 0.4f;
+	movOffset = 0.01f;
 	rotllanta = 0.0f;
 	rotllantaOffset = 10.0f;
 
-	CreateObjects();
-	CreateShaders();
-	LoadTextures();
-	LoadModels();
-	SetSkybox();
-	CreateLights();
+	glm::vec3 lowerLight(0.0f, 0.0f, 0.0f);
+	glm::mat4 model(1.0);
+	glm::mat4 modelaux(1.0);
+	glm::vec3 color (1.0f, 1.0f, 1.0f);
+	glm::vec2 toffset (0.0f, 0.0f);
 
+	glm::vec3 posblackhawk = glm::vec3(2.0f, 0.0f, 0.0f);
+
+	SetKeyframesIniciales();
+	DisplayMenuKeyframes();
+	
 	while (!mainWindow.getShouldClose())
 	{
-		UpdateDeltaTime(now);
-		UpdateVelocidadAelopile();
-		UpdateHumo();
-		UpdateCatapulta();
+		angulovaria += 0.5f * deltaTime;
 
-		//¿Cómo haces para que el carro no se salga del piso
-		if (movCoche > -250) // Restar 50 unidades 
-		{
-			movCoche -= movOffset * deltaTime;
-			rotllanta += rotllantaOffset * deltaTime;
-		}
+		//¿Cómo haces para que el coche no se salga del piso?
+		movCoche -= movOffset * deltaTime;
+		rotllanta += rotllantaOffset * deltaTime;
 
+		UpdateDeltaTime();
 		RegisterUserEvents();
+
+		//para keyframes
+		InputKeyframes(mainWindow.getsKeys());
+		animate();
+
 		ClearWindow(projection, uniformModel, uniformProjection, uniformView, uniformEyePosition, uniformColor, uniformTextureOffset);
-		SetShaderInfo(uniformSpecularIntensity, uniformShininess, uniformProjection, projection, uniformView, uniformEyePosition, lowerLight);
-		ResetVariables(model, modelaux, color, toffset, uniformTextureOffset);
-		RenderPiso(model, uniformModel, uniformColor, color, uniformTextureOffset, toffset, uniformSpecularIntensity, uniformShininess);
+		SetShaderInfo(uniformSpecularIntensity, uniformShininess, uniformProjection, projection, uniformView, uniformEyePosition, color, toffset);
+		SetFlashLight(lowerLight);
+		RenderPiso(uniformTextureOffset, toffset, model, uniformModel, uniformColor, color, uniformSpecularIntensity, uniformShininess);
+		RenderCoche(model, uniformModel, uniformSpecularIntensity, uniformShininess, modelaux, color, uniformColor);
+		RenderNave(model, posblackhawk, modelaux, uniformModel, uniformSpecularIntensity, uniformShininess);
 		RenderAelopile(model, uniformModel);
 
-		if (mainWindow.getFuegoEncendido())
-		{
-			RenderFuego(toffset, model, uniformTextureOffset, uniformModel, uniformSpecularIntensity, uniformShininess);
-		}
-
-		RenderHumo(toffset, model, uniformTextureOffset, uniformModel, uniformSpecularIntensity, uniformShininess);
-
-		RenderFlecha(toffset, model, uniformTextureOffset, uniformModel, color, uniformColor, uniformSpecularIntensity, uniformShininess);
+		//Modelos con blending al final para que no afecten a los demás objetos, aunque también se pueden renderizar al inicio pero con blending  activado y desactivado
+		RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
 		RenderNumeros(toffset, model, uniformTextureOffset, uniformModel, color, uniformColor, uniformSpecularIntensity, uniformShininess);
-		RenderCatapulta(model, modelaux, uniformModel);
-		RenderPelota(model, uniformModel);
-		RenderCanasta(model, uniformModel);
+
 		glDisable(GL_BLEND);
 		glUseProgram(0);
 		mainWindow.swapBuffers();
