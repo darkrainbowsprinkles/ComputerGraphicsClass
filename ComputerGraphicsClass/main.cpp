@@ -64,6 +64,7 @@ Model Nave_M;
 Model Ala_M;
 Model Aeolipile_base_M;
 Model Aeolipile_M;
+Model ala2;
 
 Skybox skybox;
 
@@ -98,11 +99,7 @@ void RenderPiso(GLuint uniformTextureOffset, glm::vec2& toffset, glm::mat4& mode
 void ClearWindow(const glm::mat4& projection, GLuint& uniformModel, GLuint& uniformProjection, GLuint& uniformView, GLuint& uniformEyePosition, GLuint& uniformColor, GLuint& uniformTextureOffset);
 void SetShaderInfo(GLuint& uniformSpecularIntensity, GLuint& uniformShininess, GLuint uniformProjection, glm::mat4& projection, GLuint uniformView, GLuint uniformEyePosition, glm::vec3& color, glm::vec2& toffset);
 void SetFlashLight(glm::vec3& lowerLight);
-void RenderCoche(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess, glm::mat4& modelaux, glm::vec3& color, GLuint uniformColor);
 void RenderNave(glm::mat4& model, glm::vec3& posblackhawk, glm::mat4& modelaux, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
-void RenderAelopile(glm::mat4& model, GLuint uniformModel);
-void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
-void RenderNumeros(glm::vec2& toffset, glm::mat4& model, GLuint uniformTextureOffset, GLuint uniformModel, glm::vec3& color, GLuint uniformColor, GLuint uniformSpecularIntensity, GLuint uniformShininess);
 void LoadTextures();
 void DisplayMenuKeyframes();
 void SetSkybox();
@@ -281,6 +278,13 @@ float btn_Ypos = 0, btn_Yneg = 0;
 float btn_RotPos = 0, btn_RotNeg = 0;
 float btn_HabilitarMov = 0;
 
+float velocidadAlas = 0.1f;
+float amplitudAlas = 25.0f;
+float tiempoVuelo = 0.0f;
+
+bool btn_GuardarTxt = false;
+bool btn_CargarTxt = false;
+
 #define MAX_FRAMES 100
 int i_max_steps = 600;
 int i_curr_steps = 6;
@@ -368,6 +372,52 @@ void animate(void)
 	}
 }
 
+void GuardarKeyframesArchivo()
+{
+	FILE* archivo;
+	fopen_s(&archivo, "animacion_keyframes.txt", "w");
+
+	if (archivo == NULL)
+	{
+		printf("Error al abrir el archivo para guardar.\n");
+		return;
+	}
+
+
+	fprintf(archivo, "%d\n", FrameIndex);
+
+	for (int i = 0; i < FrameIndex; i++)
+	{
+		fprintf(archivo, "%f %f %f\n", KeyFrame[i].movAvion_x, KeyFrame[i].movAvion_y, KeyFrame[i].giroAvion);
+	}
+
+	fclose(archivo);
+	printf("EXITO: Keyframes guardados en 'animacion_keyframes.txt'. (Total de frames: %d)\n", FrameIndex);
+}
+
+void CargarKeyframesArchivo()
+{
+	FILE* archivo;
+	fopen_s(&archivo, "animacion_keyframes.txt", "r");
+
+	if (archivo == NULL)
+	{
+		printf("ERROR: No se encontro el archivo 'animacion_keyframes.txt'.\n");
+		return;
+	}
+
+	fscanf_s(archivo, "%d", &FrameIndex);
+
+	for (int i = 0; i < FrameIndex; i++)
+	{
+		fscanf_s(archivo, "%f %f %f", &KeyFrame[i].movAvion_x, &KeyFrame[i].movAvion_y, &KeyFrame[i].giroAvion);
+	}
+
+	fclose(archivo);
+	printf("EXITO: Keyframes cargados correctamente. (Total de frames: %d)\n", FrameIndex);
+	resetElements();
+}
+
 ///////////////* FIN KEYFRAMES*////////////////////////////
 
 void SetSkybox()
@@ -398,6 +448,8 @@ void LoadModels()
 	Aeolipile_base_M.LoadModel("Models/Aeolipile_base.obj");
 	Aeolipile_M = Model();
 	Aeolipile_M.LoadModel("Models/Aeolipile.obj");
+	ala2 = Model();
+	ala2.LoadModel("Models/Ala2.obj");
 }
 
 void LoadTextures()
@@ -425,19 +477,24 @@ void LoadTextures()
 void DisplayMenuKeyframes()
 {
 	printf("\n--- CONTROLES DE ANIMACION POR KEYFRAMES ---\n");
-	printf("REPRODUCCION:\n");
-	printf(" [Barra Espaciadora] Reproducir animacion guardada.\n");
-	printf(" [0] Habilitar reproduccion de nuevo.\n\n");
-
-	printf("GUARDADO DE FRAMES:\n");
-	printf(" [L] Guardar el Keyframe actual.\n");
-	printf(" [P] Habilitar para poder guardar el siguiente Keyframe.\n\n");
 
 	printf("MOVIMIENTO MANUAL:\n");
 	printf(" [Flechas Izq/Der] Mover nave en el eje X.\n");
 	printf(" [Flechas Arr/Aba] Mover nave en el eje Y.\n");
 	printf(" [Q / E] Girar la nave hacia la izquierda/derecha.\n");
-	printf(" [2] Habilitar movimiento.\n");
+	printf(" [2] Habilitar movimiento.\n\n");
+
+	printf("GUARDADO DE FRAMES EN MEMORIA:\n");
+	printf(" [L] Guardar el Keyframe actual.\n");
+	printf(" [P] Habilitar para poder guardar el siguiente Keyframe.\n\n");
+
+	printf("GUARDADO/CARGADO EN ARCHIVO TXT:\n");
+	printf(" [G] Guardar todos los Keyframes generados en 'animacion_keyframes.txt'.\n");
+	printf(" [C] Cargar Keyframes desde el archivo TXT.\n\n");
+
+	printf("REPRODUCCION:\n");
+	printf(" [Barra Espaciadora] Reproducir animacion guardada/cargada.\n");
+	printf(" [0] Habilitar reproduccion de nuevo.\n");
 	printf("--------------------------------------------\n\n");
 }
 
@@ -560,242 +617,43 @@ void SetFlashLight(glm::vec3& lowerLight)
 	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 }
 
-void RenderCoche(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess, glm::mat4& modelaux, glm::vec3& color, GLuint uniformColor)
-{
-	//Pista
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, -2.1f, 2.0f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	//Pista_M.RenderModel();
-
-	//Instancia del coche 
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(movCoche - 50.0f, 0.5f, -2.0f));
-	modelaux = model;
-	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-	model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Kitt_M.RenderModel();
-
-	//Llanta delantera izquierda
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
-	model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, rotllanta * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-	color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Llanta_M.RenderModel();
-
-	//Llanta trasera izquierda
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
-	model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, rotllanta * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Llanta_M.RenderModel();
-
-	//Llanta delantera derecha
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, -rotllanta * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Llanta_M.RenderModel();
-
-	//Llanta trasera derecha
-	model = modelaux;
-	model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, -rotllanta * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Llanta_M.RenderModel();
-}
-
 void RenderNave(glm::mat4& model, glm::vec3& posblackhawk, glm::mat4& modelaux, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess)
 {
 	model = glm::mat4(1.0);
 	posblackhawk = glm::vec3(posXavion + movAvion_x, posYavion + movAvion_y, posZavion);
+
 	model = glm::translate(model, posblackhawk);
+	model = glm::rotate(model, (giroAvion)*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 	modelaux = model;
-	model = glm::rotate(model, (180 + giroAvion) * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	Nave_M.RenderModel();
 
+	if (play)
+	{
+		tiempoVuelo += deltaTime; 
+	}
+	else
+	{
+		tiempoVuelo = 0.0f; 
+	}
+
+	float anguloAnimacion = sin(tiempoVuelo * velocidadAlas) * amplitudAlas;
+
 	model = modelaux;
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.5f));
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -0.3f));
+	model = glm::rotate(model, (90.0f + anguloAnimacion) * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	Ala_M.RenderModel();
-}
 
-void RenderAelopile(glm::mat4& model, GLuint uniformModel)
-{
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(10.0f, -0.5f, 3.5f));
+	model = modelaux;
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.3f));
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, -1.0f));
+	model = glm::rotate(model, (90.0f + anguloAnimacion) * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Aeolipile_base_M.RenderModel();
-
-	model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	Aeolipile_M.RenderModel();
-}
-
-void RenderAgave(glm::mat4& model, GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess)
-{
-	//Agave ¿qué sucede si lo renderizan antes del coche y de la pista?
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(0.0f, 0.5f, -2.0f));
-	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//blending: transparencia o traslucidez
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	AgaveTexture.UseTexture();
-	Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[3]->RenderMesh();
-}
-
-void RenderNumeros(glm::vec2& toffset, glm::mat4& model, GLuint uniformTextureOffset, GLuint uniformModel, glm::vec3& color, GLuint uniformColor, GLuint uniformSpecularIntensity, GLuint uniformShininess)
-{
-	//textura con movimiento
-	//Importantes porque la variable uniform no podemos modificarla directamente
-	toffsetflechau += 0.001;
-	toffsetflechav = 0.000;
-	//para que no se desborde la variable
-	if (toffsetflechau > 1.0)
-		toffsetflechau = 0.0;
-	//if (toffsetv > 1.0)
-	//	toffsetv = 0;
-	//pasar a la variable uniform el valor actualizado
-	toffset = glm::vec2(toffsetflechau, toffsetflechav);
-
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-2.0f, 1.0f, -6.0f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	color = glm::vec3(1.0f, 0.0f, 0.0f);
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	FlechaTexture.UseTexture();
-	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[4]->RenderMesh();
-
-	//plano con todos los números
-	toffsetnumerou = 0.0;
-	toffsetnumerov = 0.0;
-	toffset = glm::vec2(toffsetnumerou, toffsetnumerov);
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-6.0f, 2.0f, -6.0f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	color = glm::vec3(1.0f, 1.0f, 1.0f);
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	NumerosTexture.UseTexture();
-	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[5]->RenderMesh();
-
-	//número 1
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-10.0f, 2.0f, -6.0f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	color = glm::vec3(1.0f, 1.0f, 1.0f);
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	NumerosTexture.UseTexture();
-	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[6]->RenderMesh();
-
-	for (int i = 1; i<4; i++)
-	{
-		//números 2-4
-		toffsetnumerou += 0.25;
-		toffsetnumerov = 0.0;
-		toffset = glm::vec2(toffsetnumerou, toffsetnumerov);
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-10.0f - (i * 3.0), 2.0f, -6.0f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		color = glm::vec3(1.0f, 1.0f, 1.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		NumerosTexture.UseTexture();
-		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		meshList[6]->RenderMesh();
-
-	}
-
-	for (int j = 1; j < 5; j++)
-	{
-		//números 5-8
-		toffsetnumerou += 0.25;
-		toffsetnumerov = -0.33;
-		toffset = glm::vec2(toffsetnumerou, toffsetnumerov);
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-7.0f - (j * 3.0), 5.0f, -6.0f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		color = glm::vec3(1.0f, 1.0f, 1.0f);
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		NumerosTexture.UseTexture();
-		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		meshList[6]->RenderMesh();
-	}
-
-
-	//número cambiante 
-	/*
-	¿Cómo hacer para que sea a una velocidad visible?
-	*/
-	toffsetnumerocambiau += 0.25;
-	if (toffsetnumerocambiau > 1.0)
-		toffsetnumerocambiau = 0.0;
-	toffsetnumerov = 0.0;
-	toffset = glm::vec2(toffsetnumerocambiau, toffsetnumerov);
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-10.0f, 10.0f, -6.0f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	color = glm::vec3(1.0f, 1.0f, 1.0f);
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	NumerosTexture.UseTexture();
-	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[6]->RenderMesh();
-
-	//cambiar automáticamente entre textura número 1 y número 2
-	toffsetnumerou = 0.0;
-	toffsetnumerov = 0.0;
-	toffset = glm::vec2(toffsetnumerou, toffsetnumerov);
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-13.0f, 10.0f, -6.0f));
-	model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-	glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	color = glm::vec3(1.0f, 1.0f, 1.0f);
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	Numero1Texture.UseTexture();
-	//if
-	//Numero1Texture.UseTexture();
-	//Numero2Texture.UseTexture();
-
-	Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[5]->RenderMesh();
+	Ala_M.RenderModel();
 }
 
 void RegisterUserEvents()
@@ -943,6 +801,33 @@ void InputKeyframes(bool* keys)
 			printf("Movimientos habilitados de nuevo (Presiona flechas o Q/E)\n");
 		}
 	}
+
+	// GUARDAR Y CARGAR ARCHIVO
+	if (keys[GLFW_KEY_G])
+	{
+		if (!btn_GuardarTxt)
+		{
+			GuardarKeyframesArchivo();
+			btn_GuardarTxt = true; 
+		}
+	}
+	else
+	{
+		btn_GuardarTxt = false; 
+	}
+
+	if (keys[GLFW_KEY_C])
+	{
+		if (!btn_CargarTxt)
+		{
+			CargarKeyframesArchivo();
+			btn_CargarTxt = true; 
+		}
+	}
+	else
+	{
+		btn_CargarTxt = false; 
+	}
 }
 
 int main()
@@ -1003,13 +888,7 @@ int main()
 		SetShaderInfo(uniformSpecularIntensity, uniformShininess, uniformProjection, projection, uniformView, uniformEyePosition, color, toffset);
 		SetFlashLight(lowerLight);
 		RenderPiso(uniformTextureOffset, toffset, model, uniformModel, uniformColor, color, uniformSpecularIntensity, uniformShininess);
-		RenderCoche(model, uniformModel, uniformSpecularIntensity, uniformShininess, modelaux, color, uniformColor);
 		RenderNave(model, posblackhawk, modelaux, uniformModel, uniformSpecularIntensity, uniformShininess);
-		RenderAelopile(model, uniformModel);
-
-		//Modelos con blending al final para que no afecten a los demás objetos, aunque también se pueden renderizar al inicio pero con blending  activado y desactivado
-		RenderAgave(model, uniformModel, uniformSpecularIntensity, uniformShininess);
-		RenderNumeros(toffset, model, uniformTextureOffset, uniformModel, color, uniformColor, uniformSpecularIntensity, uniformShininess);
 
 		glDisable(GL_BLEND);
 		glUseProgram(0);
