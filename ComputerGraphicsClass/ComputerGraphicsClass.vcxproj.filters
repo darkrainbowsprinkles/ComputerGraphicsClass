@@ -57,6 +57,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Nave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader_light.frag">
@@ -131,6 +134,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Nave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
